@@ -2,12 +2,32 @@ from franz.importer import import_data
 import numpy as np
 from scipy import sparse as sp
 
+
 csr_matrix = import_data()
 
-# print(csr_matrix.getnnz(0))  # | 10000, wie viele user haben diesen film gesehen, count
-print(csr_matrix.getnnz(1))  # -- 1000, wie viele filme hat dieser user geschaut, count
-# print(csr_matrix.sum(0).A1)  # | 10000, wie viele user haben diesen film gesehen, bewertungs schnitt
-# print(csr_matrix.sum(1).A1)  # -- 1000, wie viele filme hat dieser user geschaut, bewertungs schnitt
-# print(np.divide(csr_matrix.sum(1).A1, csr_matrix.getnnz(1)))  # Was für ein Bewertungsdruchschnitt hat der user
-print(np.shape(sp.hstack([csr_matrix, np.asmatrix(csr_matrix.getnnz(1)).transpose()]).todense()[:, 1000]))
-print(sp.vstack([csr_matrix, csr_matrix.getnnz(0)]).todense().size)
+# (1, 1000) How many users have seen this movie?
+usr_cnt = np.asmatrix(csr_matrix.getnnz(0))
+
+# (10000, 1) How many movies has this user seen?
+mov_cnt = np.asmatrix(csr_matrix.getnnz(1)).transpose()
+
+# (1, 1000) Sum of all ratings of this movie
+usr_sum = csr_matrix.sum(0)
+
+# (10000, 1) Sum of all ratings of this user
+mov_sum = csr_matrix.sum(1)
+
+# print(np.shape(np.mean(csr_matrix, 0)))
+# print(np.shape(np.mean(csr_matrix, 1)))
+matrix = csr_matrix.todense()
+matrix[matrix == 0] = np.nan
+
+print(np.nanmean(matrix, 1))
+# print(np.shape(np.var(csr_matrix, 1)))
+
+# (1, 1000) Mean rating of all ratings of this movie
+
+# print(np.shape(sp.h
+# Jede Reihe dividiert durch geschaute filme
+#print((sp.csr_matrix((csr_matrix.transpose() / np.asmatrix(csr_matrix.getnnz(0))).transpose())))
+# print(np.shape(np.divide(csr_matrix.sum(1), np.asmatrix(csr_matrix.getnnz(1)).transpose())))  # Was für ein Bewertungsdruchschnitt hat der user
