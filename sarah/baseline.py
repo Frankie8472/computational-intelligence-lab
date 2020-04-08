@@ -1,6 +1,6 @@
 ########################################################################################################################
 # This is the simple baseline approach from the exercise sheet 2, where every missing value is replaced with the mean  #
-# of all observed values.                                                                                              #
+# of all observed values. This scores 1.41035                                                                          #
 ########################################################################################################################
 
 # movie rating prediction based on given matrix entries
