@@ -39,7 +39,7 @@ def load_data(filename):
 
 def store_data(result_matrix):
     file = open('SarahSubmission.csv', 'w+')  # open a new file to write into
-    file.write('Id, Prediction\n')  # the header line
+    file.write('Id,Prediction\n')  # the header line
     with open('sampleSubmission.csv', 'r') as sample_file:  # open the sample file to see which values I have to submit
         sample_file.readline()  # throw the header away
         for line in sample_file:
