@@ -45,6 +45,8 @@ def keras_dot_model(input_dim_1, input_dim_2, n_latent_factors=64):
 
     merged = Dot(name='dot_product', normalize=True, axes=1)([user_vec, movie_vec])
 
+    # wert nehmen und fertig
+
     biased = Add()([merged, user_embedding_bias, movie_embedding_bias])
 
     nn = Dense(96, activation='relu')(biased)
