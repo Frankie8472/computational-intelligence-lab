@@ -3,16 +3,7 @@ from keras import backend as K
 from keras.layers import Input, Embedding, Flatten, Dot, Dense, Dropout, BatchNormalization, Add, Concatenate, Lambda, PReLU
 from keras.models import Model
 from keras.utils import to_categorical
-
 from franz.porter import export_data, import_dataframe
-
-# from sklearn.experimental import enable_iterative_imputer
-# enable_iterative_imputer
-# from sklearn.impute import IterativeImputer
-# from franz.feature_enhancer import sparse_svd
-# from scipy import sparse as sp
-# from scipy.sparse.linalg import svds
-# from fancyimpute import KNN, NuclearNormMinimization, SoftImpute, BiScaler, MatrixFactorization
 
 
 def root_mean_squared_error(y_true, y_pred):
@@ -56,8 +47,8 @@ def keras_basic_model(n_net, input_dim_1, input_dim_2, n_latent_factors=64, merg
 
 
 # Standardized normal neural net layer
-def keras_nn_layer_bundle(layer, units=1, dropout_rate=0.5):
-    nn = Dense(units=units, kernel_initializer='he_normal')(layer)
+def keras_nn_layer_bundle(input_layer, units=1, dropout_rate=0.5):
+    nn = Dense(units=units, kernel_initializer='he_normal')(input_layer)    # he_normal is better for *ReLU activation functions
     nn = BatchNormalization()(nn)
     nn = PReLU()(nn)
     nn = Dropout(rate=dropout_rate)(nn)
@@ -65,16 +56,16 @@ def keras_nn_layer_bundle(layer, units=1, dropout_rate=0.5):
 
 
 # Regression is the task of predicting a continuous quantity
-def keras_nn_reg_model(layer, nn_input):
-    nn = keras_nn_layer_bundle(layer, 128, 0.5)
-    nn = keras_nn_layer_bundle(nn, 32, 0.5)
-    nn = keras_nn_layer_bundle(nn, 64, 0.5)
+def keras_nn_reg_model(input_layer, nn_input):
+    nn = keras_nn_layer_bundle(input_layer=input_layer, units=64, dropout_rate=0.5)
+    # nn = keras_nn_layer_bundle(input_layer=nn, units=32, dropout_rate=0.5)
+    # nn = keras_nn_layer_bundle(input_layer=nn, units=64, dropout_rate=0.5)
 
     # Last layer with one node, containing the actual class number
     nn = Dense(1, kernel_initializer='glorot_uniform', activation='sigmoid')(nn)
 
     # Lambda layer to scale sigmoid (0,1) to (1,5)
-    nn = Lambda(lambda x: x * (5.0 - 1.0) + 1.0)(nn)
+    nn = Lambda(lambda x: x * (5.5 - 0.5) + 0.5)(nn)
 
     # Initialize model with input and output
     nn_output = nn
@@ -88,12 +79,12 @@ def keras_nn_reg_model(layer, nn_input):
 
 # Classification is the task of predicting a discrete class label.
 def keras_nn_clf_model(layer, nn_input):
-    nn = keras_nn_layer_bundle(layer, 128, 0.5)
-    nn = keras_nn_layer_bundle(nn, 32, 0.5)
-    nn = keras_nn_layer_bundle(nn, 64, 0.5)
+    nn = keras_nn_layer_bundle(input_layer=layer, units=128, dropout_rate=0.5)
+    # nn = keras_nn_layer_bundle(input_layer=nn, units=32, dropout_rate=0.5)
+    # nn = keras_nn_layer_bundle(input_layer=nn, units=64, dropout_rate=0.5)
 
     # Last layer with 5 nodes, containing the probability of "is in class 1..5"
-    nn = Dense(units=5, activation='sigmoid')(nn)
+    nn = Dense(units=5, activation='softmax')(nn)
 
     # Initialize model with input and output
     nn_output = nn
@@ -178,12 +169,12 @@ def main():
         input_dim_1=n_users,
         input_dim_2=n_movies,
         n_latent_factors=50,
-        model_type='reg',  # 'reg' or 'clf'
-        merge_type='dot',  # 'dot' or 'concat'
+        model_type='clf',  # 'reg' or 'clf'
+        merge_type='dot',  # 'dot' or 'concat' or 'euclid'
         batch_size=500,
         epochs=30,
         prediction=True,
-        show_only=False
+        show_only=True
     )
 
     return
