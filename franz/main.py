@@ -14,7 +14,7 @@ def keras_basic_model(n_net, input_dim_1, input_dim_2, n_latent_factors=64, merg
     # Define input layers
     user_input = Input(name='user_input', shape=(1,))
     movie_input = Input(name='movie_input', shape=(1,))
-
+    
     # Embedding layer for creating two dynamic matrices, containing the latent features
     user_embedding = Embedding(name='user_embedding', input_dim=input_dim_1, output_dim=n_latent_factors)(user_input)
     movie_embedding = Embedding(name='movie_embedding', input_dim=input_dim_2, output_dim=n_latent_factors)(movie_input)
@@ -173,7 +173,7 @@ def main():
         merge_type='dot',  # 'dot' or 'concat' or 'euclid'
         batch_size=500,
         epochs=30,
-        prediction=True,
+        prediction=False,
         show_only=True
     )
 
