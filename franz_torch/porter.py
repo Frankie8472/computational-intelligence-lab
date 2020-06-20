@@ -47,35 +47,27 @@ def csv_to_pt(filepath='../input/data_train.csv'):
     indices = torch.tensor(np.vstack((data.row, data.col)))
     values = torch.tensor(np)
     tensor = torch.sparse_coo_tensor(indices=indices, values=values, dtype=torch.int8).to_dense()
-    torch.save(tensor, filepath[0:-3]+"pt")
+    torch.save(tensor, filepath[0:-3] + "pt")
     return
 
 
 def export_data(data, name):
-    print(len(data))
-    print(len(data[:]))
     with open('../output/' + name + 'Submission.csv', 'w') as file:
         file.write('Id,Prediction')
-        for i in range(0, len(data)):
-            row = int(data[i][0] + 1)
-            col = int(data[i][1] + 1)
-            val = int(data[i][2])
+        i = 0
+        nnz = data.nonzero()
+        nnz = nnz.cpu()
+        nnz = nnz.numpy()
+        nnz = nnz[nnz[:, 0].argsort()]
+        nnz = nnz[nnz[:, 1].argsort(kind='mergesort')]
+
+        for idx in nnz:
+            row = idx[0]
+            col = idx[1]
+            val = data.data[row, col].item()
             file.write("\n")
-            file.write('r' + str(row) + '_c' + str(col) + ',' + str(round(val)))
+            file.write('r' + str(row + 1) + '_c' + str(col + 1) + ',' + str(round(val)))
+            i += 1
+            if i % 10e4 == 0:
+                print(i)
     return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
