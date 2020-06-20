@@ -59,7 +59,8 @@ def load_data_usr_mean(filename):
 
 # load the data and insert it into a matrix accordingly
 # fill empty entries with the mean per movie
-def load_data_movie_mean(filename):
+# each rating is weighted according to the weight array
+def load_data_movie_mean(filename, weights):
     nr_of_users = 10000
     nr_of_movies = 1000
     ratings = []
@@ -74,8 +75,8 @@ def load_data_movie_mean(filename):
             row = int(row_entry[1:])  # remove the 'r'
             column = int(column_entry[1:])  # remove the 'c'
             ratings.append((row-1, column-1, star_rating))  # the IDs are 1-indexed, so subtract 1
-            movie_means[column-1] += star_rating
-            ratings_per_movie[column-1] += 1
+            movie_means[column-1] += star_rating * weights[star_rating-1]
+            ratings_per_movie[column-1] += weights[star_rating-1]
     data_matrix = np.full((nr_of_users, nr_of_movies), 0)  # fill every entry with the mean per default
     for i in range(1000):
         movie_means[i] /= ratings_per_movie[i]
