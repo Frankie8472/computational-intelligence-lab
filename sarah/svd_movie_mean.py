@@ -52,7 +52,7 @@ def compute_svd(data_matrix, to_truncate):
     return u_, v_t
 
 
-loaded_matrix, given_ratings, mean = load_data_usr_mean('../input/data_train.csv')
+loaded_matrix, given_ratings, mean = load_data_movie_mean('../input/data_train.csv')
 U, V = compute_svd(loaded_matrix, 8)
 asked_entries = get_asked_entries()
 result_matrix = predict_values(asked_entries, U, V, loaded_matrix)

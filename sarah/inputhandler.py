@@ -57,6 +57,35 @@ def load_data_usr_mean(filename):
     return data_matrix, ratings, usr_means
 
 
+# load the data and insert it into a matrix accordingly
+# fill empty entries with the mean per movie
+def load_data_movie_mean(filename):
+    nr_of_users = 10000
+    nr_of_movies = 1000
+    ratings = []
+    movie_means = [0] * nr_of_movies
+    ratings_per_movie = [0] * nr_of_movies
+    with open(filename, 'r') as file:
+        file.readline()  # remove the header, don't save it, because we don't need it
+        for line in file:
+            entry, prediction = line.split(',')  # split the movie rating from the ID
+            star_rating = int(prediction)  # save the rating
+            row_entry, column_entry = entry.split('_')  # split the ID accordingly (they have the format rX_cY)
+            row = int(row_entry[1:])  # remove the 'r'
+            column = int(column_entry[1:])  # remove the 'c'
+            ratings.append((row-1, column-1, star_rating))  # the IDs are 1-indexed, so subtract 1
+            movie_means[column-1] += star_rating
+            ratings_per_movie[column-1] += 1
+    data_matrix = np.full((nr_of_users, nr_of_movies), 0)  # fill every entry with the mean per default
+    for i in range(1000):
+        movie_means[i] /= ratings_per_movie[i]
+        for j in range(10000):
+            data_matrix[j][i] = movie_means[i]
+    for (row, column, starRating) in ratings:
+        data_matrix[row, column] = starRating  # replace the given entries with the ratings
+    return data_matrix, ratings, movie_means
+
+
 # return a list of entries that should be predicted
 def get_asked_entries():
     asked_entries = []
