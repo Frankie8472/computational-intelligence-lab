@@ -1,4 +1,7 @@
 ## Alternating Least Squares
+# lambda = 50 seems to be the best parameter (needs to be verified)
+# k=41 is taken from the weighted_movie_mean_svd (the nr of singular values that were kept)
+
 from sarah.inputhandler import *
 import random
 
