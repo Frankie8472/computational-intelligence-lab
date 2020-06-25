@@ -1,10 +1,3 @@
-########################################################################################################################
-# Searches through every possible value for truncating the diagonal SVD-matrix and looks for the one with the          #
-# smallest RMSE-Error                                                                                                  #
-# For this purpose, the known values are splitted 90-10 for cross-validation                                           #
-########################################################################################################################
-
-
 # movie rating prediction based on given matrix entries
 # 10'000 Users (rows)
 # 1'000 Movies (columns)

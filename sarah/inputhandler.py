@@ -53,7 +53,7 @@ def load_data_usr_mean(filename):
         for j in range(1000):
             data_matrix[i][j] = usr_means[i]
     for (row, column, starRating) in ratings:
-        data_matrix[row, column] = starRating  # replace the given entries with the ratings
+        data_matrix[row][column] = starRating  # replace the given entries with the ratings
     return data_matrix, ratings, usr_means
 
 
@@ -83,7 +83,7 @@ def load_data_movie_mean(filename, weights):
         for j in range(10000):
             data_matrix[j][i] = movie_means[i]
     for (row, column, starRating) in ratings:
-        data_matrix[row, column] = starRating  # replace the given entries with the ratings
+        data_matrix[row][column] = starRating  # replace the given entries with the ratings
     return data_matrix, ratings, movie_means
 
 
@@ -107,7 +107,7 @@ def store_data(result_matrix):
     file.write('Id,Prediction\n')  # the header line
     asked_entries = get_asked_entries()
     for (i, j) in asked_entries:
-        file.write('r' + str(i+1) + '_c' + str(j+1) + ',' + str(result_matrix[i][j]) + '\n')  # store with the same ID as the sample
+        file.write('r' + str(i+1) + '_c' + str(j+1) + ',' + str(int(round(result_matrix[i][j]))) + '\n')  # store with the same ID as the sample
 
 
 # randomly pick 10% of the entries for cross validation
@@ -117,7 +117,7 @@ def split_data(data_matrix, ratings, data_mean):
     asked_entries = random.sample(ratings, nr_of_asked_entries)  # randomly sample the 10% we want to fill in
     pred_matrix = data_matrix
     for (row, column, star_rating) in asked_entries:
-        pred_matrix[row][column] = data_mean
+        pred_matrix[row][column] = data_mean[column]
     return pred_matrix, asked_entries
 
 

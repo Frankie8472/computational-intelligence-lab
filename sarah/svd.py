@@ -1,8 +1,7 @@
 ########################################################################################################################
 # This is the first improvement using SVD from the exercise sheet 2                                                    #
-# Searches through every possible value for truncating the diagonal SVD-matrix and looks for the one with the          #
-# smallest RMSE-Error                                                                                                  #
-# For this purpose, the known values are splitted 90-10 for cross-validation                                           #
+# Searched through every possible value for truncating the diagonal SVD-matrix and looks for the one with the          #
+# smallest RMSE-Error, keeping the first 8 singular values is best                                                     #
 ########################################################################################################################
 
 # movie rating prediction based on given matrix entries
