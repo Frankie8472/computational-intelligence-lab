@@ -1,6 +1,7 @@
 ## Alternating Least Squares
 # lambda = 50 seems to be the best parameter (needs to be verified)
 # k=41 is taken from the weighted_movie_mean_svd (the nr of singular values that were kept)
+# data centering (even with shrinking) makes the score worse (remove this before further work)
 
 from sarah.inputhandler import *
 import random
@@ -66,6 +67,9 @@ def replace_v(rating_list, data_mat, U_mat, lamb, k_val):
 # load the data
 data, ratings, means = load_data_movie_mean('../input/data_train.csv', [100, 10, 1, 10, 100])
 
+# center the data to remove bias
+data = center_deviation_movie_mean(data, ratings)
+
 # prepare the ratings
 ratings_row = [[] for i in range(10000)]
 ratings_col = [[] for j in range(1000)]
@@ -106,4 +110,7 @@ while (abs(old_loss - loss) > 1):
     loss = compute_loss(data, ratings, lam, U, V)
     print(loss)
 
-store_data(np.matmul(U, V))
+result = np.matmul(U, V)
+
+# reverse the previous data centering and store the data in the submission file
+store_data(reverse_centering_deviation(result, ratings))

@@ -131,3 +131,138 @@ def split_users(data_matrix, data_mean):
             pred_matrix[i][j] = data_mean
     return pred_matrix, asked_users
 
+
+def shrink(nr_of_ratings, means, ratings):
+    alpha = 1
+
+    mean = 0
+
+    for (row, column, star_rating) in ratings:
+        mean += star_rating
+
+    mean /= len(ratings)
+
+    for i in range(1000):
+        means[i] = (alpha/(alpha + nr_of_ratings[i])) * mean + (nr_of_ratings[i] / (alpha + nr_of_ratings[i])) * means[i]
+
+    return means
+
+
+# center the data by removing a bias term
+# method used: global mean rating
+def center_global_mean(data, ratings):
+    mean = 0
+
+    for (row, column, star_rating) in ratings:
+        mean += star_rating
+
+    mean /= len(ratings)
+
+    for (row, column, star_rating) in ratings:
+        data[row, column] -= mean
+
+    return data
+
+
+# center the data by removing a bias term
+# method used: movie mean rating
+def center_movie_mean(data, ratings):
+    movie_mean = [0 for i in range(1000)]
+    movie_ratings = [0 for i in range(1000)]
+
+    for (row, column, star_rating) in ratings:
+        movie_mean[column] += star_rating
+        movie_ratings[column] += 1
+
+    for i in range(1000):
+        movie_mean[i] /= movie_ratings[i]
+
+    for (row, column, star_rating) in ratings:
+        data[row, column] -= movie_mean[column]
+
+    return data
+
+
+# center the data by removing a bias term
+# method used: user mean rating
+def center_user_mean(data, ratings):
+    user_mean = [0 for i in range(10000)]
+    user_ratings = [0 for i in range(10000)]
+
+    for (row, column, star_rating) in ratings:
+        user_mean[row] += star_rating
+        user_ratings[row] += 1
+
+    for i in range(10000):
+        user_mean[i] /= user_ratings[i]
+
+    for (row, column, star_rating) in ratings:
+        data[row, column] -= user_mean[row]
+
+    return data
+
+
+# center the data by removing a bias term
+# method used: movie mean and user mean deviation from movie mean
+def center_deviation_movie_mean(data, ratings):
+    movie_mean = [0 for i in range(1000)]
+    movie_ratings = [0 for i in range(1000)]
+
+    for (row, column, star_rating) in ratings:
+        movie_mean[column] += star_rating
+        movie_ratings[column] += 1
+
+    for i in range(1000):
+        movie_mean[i] /= movie_ratings[i]
+
+    movie_mean = shrink(movie_ratings, movie_mean, ratings)
+
+    user_mean = [0 for i in range(10000)]
+    user_ratings = [0 for i in range(10000)]
+
+    for (row, column, star_rating) in ratings:
+        user_mean[row] += (star_rating - movie_mean[column])
+        user_ratings[row] += 1
+
+    for i in range(10000):
+        user_mean[i] /= user_ratings[i]
+
+    user_mean = shrink(user_ratings, user_mean, ratings)
+
+    for (row, column, star_rating) in ratings:
+        data[row, column] -= (user_mean[row] + movie_mean[column])
+
+    return data
+
+
+# additionally apply shrinkage on the movie means
+def reverse_centering_deviation(data, ratings):
+    movie_mean = [0 for i in range(1000)]
+    movie_ratings = [0 for i in range(1000)]
+
+    for (row, column, star_rating) in ratings:
+        movie_mean[column] += star_rating
+        movie_ratings[column] += 1
+
+    for i in range(1000):
+        movie_mean[i] /= movie_ratings[i]
+
+    movie_mean = shrink(movie_ratings, movie_mean, ratings)
+
+    user_mean = [0 for i in range(10000)]
+    user_ratings = [0 for i in range(10000)]
+
+    for (row, column, star_rating) in ratings:
+        user_mean[row] += (star_rating - movie_mean[column])
+        user_ratings[row] += 1
+
+    for i in range(10000):
+        user_mean[i] /= user_ratings[i]
+
+    user_mean = shrink(user_ratings, user_mean, ratings)
+
+    for i in range(10000):
+        for j in range(1000):
+            data[i, j] += (user_mean[i] + movie_mean[j])
+
+    return data
