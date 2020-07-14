@@ -9,8 +9,8 @@ Using cross validation, we compare the score of different approaches.
 Save matrix with filled in values as csv.
 '''
 
-def fill(data_path: str, users: int, movies: int, output_path: str,
-        cross_validate: bool = False) -> None:
+def fill(data_path: str, users: int, movies: int,
+        cross_validate: bool = False) -> ('numpy.ndarray, set'):
     '''
     This function is called by run.py to fill unknown ratings with values.
     Writes the full matrix to a csv in the same format as data_path to
@@ -19,9 +19,7 @@ def fill(data_path: str, users: int, movies: int, output_path: str,
     :param data_path: path to rating csv
     :param users: number of users
     :param movies: number of movies
-    :param output_path: path to csv to which the matrix should be written to
-    :param cross_validate: True, if cross validation should be done. No output
-        file will then be written.
+    :param cross_validate: True, if cross validation should be done
     '''
     if cross_validate:
         print('Matrix filling approach:')
@@ -29,13 +27,11 @@ def fill(data_path: str, users: int, movies: int, output_path: str,
     approach_id = 5
     A = do_approach[approach_id](A, ratings, users, movies, cross_validate,
             data_path)
-    if not cross_validate:
-        util.create_submission_csv(A, output_path)
-
+    return A, ratings
 
 
 def same_value(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
-        cross_validate: bool, data_path: str = None) -> 'np.ndarray':
+        cross_validate: bool, data_path: str) -> 'numpy.ndarray':
     '''
     Use same value for all unknowns.
 
@@ -43,8 +39,7 @@ def same_value(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
     :param ratings: set of known rating tuples (row, column, rating)
     :param user: number of users
     :param movies: number of movies
-    :param cross_validate: True, if cross validation should be done. No output
-        file will then be written.
+    :param cross_validate: True, if cross validation should be done. 
     :param data_path: path to input rating csv
     :return: full matrix
     '''
@@ -59,7 +54,7 @@ def same_value(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
 
 
 def mean_of_all(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
-        cross_validate: bool, data_path: str) -> 'np.ndarray':
+        cross_validate: bool, data_path: str) -> 'numpy.ndarray':
     '''
     Use mean of all known values.
 
@@ -67,8 +62,7 @@ def mean_of_all(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
     :param ratings: set of known rating tuples (row, column, rating)
     :param user: number of users
     :param movies: number of movies
-    :param cross_validate: True, if cross validation should be done. No output
-        file will then be written.
+    :param cross_validate: True, if cross validation should be done. 
     :param data_path: path to input rating csv
     :return: full matrix
     '''
@@ -86,7 +80,7 @@ def mean_of_all(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
 
 
 def mean_of_user(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
-        cross_validate: bool, data_path: str) -> 'np.ndarray':
+        cross_validate: bool, data_path: str) -> 'numpy.ndarray':
     '''
     Use mean of each user.
 
@@ -94,8 +88,7 @@ def mean_of_user(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
     :param ratings: set of known rating tuples (row, column, rating)
     :param user: number of users
     :param movies: number of movies
-    :param cross_validate: True, if cross validation should be done. No output
-        file will then be written.
+    :param cross_validate: True, if cross validation should be done.
     :param data_path: path to input rating csv
     :return: full matrix
     '''
@@ -113,7 +106,7 @@ def mean_of_user(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
 
 
 def mean_of_movie(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
-        cross_validate: bool, data_path: str) -> 'np.ndarray':
+        cross_validate: bool, data_path: str) -> 'numpy.ndarray':
     '''
     Use mean of each movie.
 
@@ -121,8 +114,7 @@ def mean_of_movie(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
     :param ratings: set of known rating tuples (row, column, rating)
     :param user: number of users
     :param movies: number of movies
-    :param cross_validate: True, if cross validation should be done. No output
-        file will then be written.
+    :param cross_validate: True, if cross validation should be done.
     :param data_path: path to input rating csv
     :return: full matrix
     '''
@@ -141,7 +133,7 @@ def mean_of_movie(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
 
 def mean_of_movie_adjusted(A: 'numpy.ndarray', ratings: set, users: int,
         movies: int,
-        cross_validate: bool, data_path: str) -> 'np.ndarray':
+        cross_validate: bool, data_path: str) -> 'numpy.ndarray':
     '''
     Use mean of each movie. Increase all ratings of a user if they rated enough
     movies (above a certain threshold) and their average is >=4. Decrease if 
@@ -151,8 +143,7 @@ def mean_of_movie_adjusted(A: 'numpy.ndarray', ratings: set, users: int,
     :param ratings: set of known rating tuples (row, column, rating)
     :param user: number of users
     :param movies: number of movies
-    :param cross_validate: True, if cross validation should be done. No output
-        file will then be written.
+    :param cross_validate: True, if cross validation should be done.
     :param data_path: path to input rating csv
     :return: full matrix
     '''
