@@ -3,4 +3,7 @@
 # IDEs and editors
 /.idea
 /.git
+/output/
 
+/xDeepFMcode/
+/input/data_train.pt

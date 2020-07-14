@@ -24,27 +24,43 @@ def import_raw_data(filepath):
     return np.c_[rows, cols, data]
 
 
-def import_dataframe():
-    filepath = '../input/data_train.csv'
-    column_names = ['userId', 'movieId', 'rating']
-    return pd.DataFrame(import_raw_data(filepath), columns=column_names, dtype=np.float64)
+def import_dataframe(filepath='../input/data_train.csv', column_names=None):
+    if column_names is None:
+        column_names = ['userId', 'movieId', 'rating']
+
+    return pd.DataFrame(import_raw_data(filepath), columns=column_names)
 
 
-def import_csr():
-    filepath = '../input/data_train.csv'
+def import_csr(filepath = '../input/data_train.csv'):
     data = import_raw_data(filepath)
-    return sp.csr_matrix((data[2], (data[0], data[1])), dtype=np.float64)
+    return sp.csr_matrix((data[2], (data[0], data[1])), dtype=np.float32)
 
 
-def export_data(extended_matrix, name):
-    filepath = '../output/sampleSubmission.csv'
-    data = import_raw_data(filepath)
-
+def export_data(data, name):
+    print(len(data))
+    print(len(data[:]))
     with open('../output/' + name + 'Submission.csv', 'w') as file:
-        file.write('Id,Prediction\n')
-        for i in range(0, len(data[0])):
-            row = data[0][i] + 1
-            col = data[1][i] + 1
-            file.write('r' + str(row) + '_c' + str(col) + ',' + str(round(extended_matrix[row - 1, col - 1])))
+        file.write('Id,Prediction')
+        for i in range(0, len(data)):
+            row = int(data[i][0] + 1)
+            col = int(data[i][1] + 1)
+            val = int(data[i][2])
             file.write("\n")
+            file.write('r' + str(row) + '_c' + str(col) + ',' + str(round(val)))
     return
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
