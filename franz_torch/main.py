@@ -3,6 +3,7 @@ from sklearn.metrics import roc_auc_score
 import numpy as np
 import pandas as pd
 from fastai.collab import *
+import fastai
 import torch
 import os
 
@@ -74,7 +75,7 @@ def get_collabDataBunch(parameters, path, train=True):
         val_bs=None,
         num_workers=defaults.cpus,
         dl_tfms=None,
-        device=None,
+        device=parameters.DEVICE,
         collate_fn=data_collate,
         no_check=False
     )
@@ -84,6 +85,7 @@ def get_collabDataBunch(parameters, path, train=True):
 
 def main():
     parameters = Parameters()
+    fastai.device = parameters.DEVICE
     cdb = get_collabDataBunch(parameters, parameters.DATA_SET_PATH)
     y_range = [0.5, 5.5]
     learn = collab_learner(
@@ -99,9 +101,10 @@ def main():
         use_bn=True,
         bn_final=False
     )
-    learn.lr_find()
-    learn.recorder.plot(skip_end=15)
 
+    learn.fit(parameters.EPOCHS)
+    #learn.predict()
+    #print(learn.model)
 
 if __name__ == "__main__":
     main()
