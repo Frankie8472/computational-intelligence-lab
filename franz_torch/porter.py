@@ -42,12 +42,19 @@ def import_coo(filepath='../input/data_train.csv'):
     return sp.coo_matrix((data[:, 2], (data[:, 0], data[:, 1])))
 
 
-def csv_to_pt(filepath='../input/data_train.csv'):
+def csv_to_pt_dense(filepath='../input/data_train.csv'):
     data = import_coo(filepath)
     indices = torch.tensor(np.vstack((data.row, data.col)))
     values = torch.tensor(np)
     tensor = torch.sparse_coo_tensor(indices=indices, values=values, dtype=torch.int8).to_dense()
-    torch.save(tensor, filepath[0:-3] + "pt")
+    torch.save(tensor, filepath[0:-4] + "_dense.pt")
+    return
+
+
+def csv_to_pt(filepath='../input/data_train.csv'):
+    data = import_raw_data(filepath)
+    tensor = torch.tensor(data, dtype=torch.int16)
+    torch.save(tensor, filepath[0:-4] + ".pt")
     return
 
 
