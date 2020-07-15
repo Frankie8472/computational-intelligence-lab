@@ -61,7 +61,7 @@ class MultiLayerPerceptron(nn.Module):
     Class to instantiate a Multilayer Perceptron model
     """
 
-    def __init__(self, input_dim, output, embed_dims, dropout, output_layer=True):
+    def __init__(self, input_dim, output_dim, embed_dims, dropout, output_layer=True):
         super().__init__()
         layers = list()
         for embed_dim in embed_dims:
@@ -71,7 +71,7 @@ class MultiLayerPerceptron(nn.Module):
             layers.append(nn.Dropout(p=dropout))
             input_dim = embed_dim
         if output_layer:
-            layers.append(nn.Linear(input_dim, output))
+            layers.append(nn.Linear(input_dim, output_dim))
         self.mlp = nn.Sequential(*layers)
 
     def forward(self, x):
@@ -88,7 +88,7 @@ class WideAndDeepModel(torch.nn.Module):
         HT Cheng, et al. Wide & Deep Learning for Recommender Systems, 2016.
     """
 
-    def __init__(self, field_dims, output, embed_dim=20, mlp_dims=(16, 16), dropout=0.3):
+    def __init__(self, field_dims, output_dim, embed_dim=20, mlp_dims=(16, 16), dropout=0.3):
         """
         :param field_dims: Number of input dimensions
         :param embed_dim: Number of dense embedding dimensions
@@ -98,12 +98,12 @@ class WideAndDeepModel(torch.nn.Module):
         super().__init__()
 
         # Wide Learning Component
-        self.linear = FeaturesLinear(field_dims, output)
+        self.linear = FeaturesLinear(field_dims, output_dim)
 
         # Deep Learning Component
         self.embedding = FeaturesEmbedding(field_dims, embed_dim)
         self.embed_output_dim = len(field_dims) * embed_dim
-        self.mlp = MultiLayerPerceptron(self.embed_output_dim, output, mlp_dims, dropout)
+        self.mlp = MultiLayerPerceptron(self.embed_output_dim, output_dim, mlp_dims, dropout)
 
     def forward(self, x):
         """
