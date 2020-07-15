@@ -35,10 +35,6 @@ def create_submission_csv(A: 'numpy.ndarray', output_path: str) -> None:
 
     :param A: rating matrix
     :param output_path: path to output csv
-    Create submission file.
-
-    :param A: rating matrix
-    :param id: submission ID
     '''
     unknowns = pd.read_csv('../input_data/sampleSubmission.csv')
     file = open(output_path, 'w+')
@@ -69,7 +65,8 @@ def split_data(data_matrix, ratings, data_mean, c):
 def score(result, asked):
     RMSE = 0.
     for (r, c, rating) in asked:
-        RMSE += (result[r][c] - rating) ** 2
+        assert not np.isnan(result[r][c])
+        RMSE += (result[r][c] - rating) ** 2 
     RMSE /= len(asked)
     return RMSE ** 0.5
 
