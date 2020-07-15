@@ -1,7 +1,6 @@
 import numpy as np
 import random
 
-
 # load the data and insert it into a matrix accordingly
 # fill empty entries with the mean of the given data
 def load_data(filename):
@@ -26,6 +25,25 @@ def load_data(filename):
     for (row, column, starRating) in ratings:
         data_matrix[row, column] = starRating  # replace the given entries with the ratings
     return data_matrix, ratings, data_mean
+
+
+def load_data_zeros(filename):
+    nr_of_users = 10000
+    nr_of_movies = 1000
+    ratings = []
+    with open(filename, 'r') as file:
+        file.readline()  # remove the header, don't save it, because we don't need it
+        for line in file:
+            entry, prediction = line.split(',')  # split the movie rating from the ID
+            star_rating = int(prediction)  # save the rating
+            row_entry, column_entry = entry.split('_')  # split the ID accordingly (they have the format rX_cY)
+            row = int(row_entry[1:])  # remove the 'r'
+            column = int(column_entry[1:])  # remove the 'c'
+            ratings.append((row-1, column-1, star_rating))  # the IDs are 1-indexed, so subtract 1
+    data_matrix = np.full((nr_of_users, nr_of_movies), 0.0)  # fill every entry with the mean per default
+    for (row, column, starRating) in ratings:
+        data_matrix[row, column] = float(starRating)  # replace the given entries with the ratings
+    return data_matrix, ratings
 
 
 # load the data and insert it into a matrix accordingly
@@ -108,6 +126,16 @@ def store_data(result_matrix):
     asked_entries = get_asked_entries()
     for (i, j) in asked_entries:
         file.write('r' + str(i+1) + '_c' + str(j+1) + ',' + str(int(round(result_matrix[i][j]))) + '\n')  # store with the same ID as the sample
+
+
+# store the data according to the sample submission
+def store_data_float(result_matrix):
+    file = open('SarahSubmission.csv', 'w+')  # open a new file to write into
+    file.write('Id,Prediction\n')  # the header line
+    asked_entries = get_asked_entries()
+    for (i, j) in asked_entries:
+        file.write('r' + str(i+1) + '_c' + str(j+1) + ',' + str(result_matrix[i][j]) + '\n')  # store with the same ID as the sample
+
 
 
 # randomly pick 10% of the entries for cross validation
@@ -202,9 +230,7 @@ def center_user_mean(data, ratings):
     return data
 
 
-# center the data by removing a bias term
-# method used: movie mean and user mean deviation from movie mean
-def center_deviation_movie_mean(data, ratings):
+def compute_deviation(ratings):
     movie_mean = [0 for i in range(1000)]
     movie_ratings = [0 for i in range(1000)]
 
@@ -228,6 +254,14 @@ def center_deviation_movie_mean(data, ratings):
         user_mean[i] /= user_ratings[i]
 
     user_mean = shrink(user_ratings, user_mean, ratings)
+
+    return user_mean, movie_mean
+
+
+# center the data by removing a bias term
+# method used: movie mean and user mean deviation from movie mean
+def center_deviation_movie_mean(data, ratings):
+    user_mean, movie_mean = compute_deviation(ratings)
 
     for (row, column, star_rating) in ratings:
         data[row, column] -= (user_mean[row] + movie_mean[column])
@@ -235,31 +269,8 @@ def center_deviation_movie_mean(data, ratings):
     return data
 
 
-# additionally apply shrinkage on the movie means
 def reverse_centering_deviation(data, ratings):
-    movie_mean = [0 for i in range(1000)]
-    movie_ratings = [0 for i in range(1000)]
-
-    for (row, column, star_rating) in ratings:
-        movie_mean[column] += star_rating
-        movie_ratings[column] += 1
-
-    for i in range(1000):
-        movie_mean[i] /= movie_ratings[i]
-
-    movie_mean = shrink(movie_ratings, movie_mean, ratings)
-
-    user_mean = [0 for i in range(10000)]
-    user_ratings = [0 for i in range(10000)]
-
-    for (row, column, star_rating) in ratings:
-        user_mean[row] += (star_rating - movie_mean[column])
-        user_ratings[row] += 1
-
-    for i in range(10000):
-        user_mean[i] /= user_ratings[i]
-
-    user_mean = shrink(user_ratings, user_mean, ratings)
+    user_mean, movie_mean = compute_deviation(ratings)
 
     for i in range(10000):
         for j in range(1000):

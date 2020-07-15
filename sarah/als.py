@@ -113,4 +113,4 @@ while (abs(old_loss - loss) > 1):
 result = np.matmul(U, V)
 
 # reverse the previous data centering and store the data in the submission file
-store_data(reverse_centering_deviation(result, ratings))
+store_data_float(reverse_centering_deviation(result, ratings))
