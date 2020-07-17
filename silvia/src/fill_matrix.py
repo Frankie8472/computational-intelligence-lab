@@ -112,9 +112,10 @@ def mean_of_movie(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
 def mean_of_movie_adjusted(A: 'numpy.ndarray', ratings: set, users: int,
         movies: int, data_path: str) -> 'numpy.ndarray':
     '''
-    Use mean of each movie. Increase all ratings of a user if they rated enough
-    movies (above a certain threshold) and their average is >=4. Decrease if 
-    average is <= 2. Reason: Some users may tend to give low or high ratings.
+    Use mean of each movie. Increase all ratings of a user if they rated
+    enough movies (above a certain threshold) and their average is >=4.
+    Decrease if average is <= 2. Reason: Some users may tend to give low
+    or high ratings.
 
     :param A: rating matrix with np.nan as unknown ratings
     :param ratings: set of known rating tuples (row, column, rating)

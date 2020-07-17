@@ -6,7 +6,8 @@ import pandas as pd
 import re
 import random
 
-def csv_to_rating_matrix(data_path: str, unknown: int, users: int, movies: int) -> ('numpy.ndarray', set): 
+def csv_to_rating_matrix(data_path: str, unknown: int, users: int,
+        movies: int) -> ('numpy.ndarray', set): 
     '''
     Create matrix out of csv file, fill in unknown ratings.
 
