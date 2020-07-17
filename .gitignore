@@ -6,5 +6,7 @@
 /output/
 
 __pycache__/
+*.csv
+*.pth
 /xDeepFMcode/
 /input/data_train.pt
