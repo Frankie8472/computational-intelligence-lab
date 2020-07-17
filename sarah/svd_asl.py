@@ -22,7 +22,7 @@ def predict_values(asked_entries, u, v, matrix):
 def truncate(s, to_truncate):
     n = s.shape[0]
     # print(s.shape)
-    return np.append(s[:to_truncate], np.zeros(n-to_truncate))
+    return np.append(np.sqrt(s[:to_truncate]), np.zeros(n - to_truncate))
 
 
 def plot(values):
@@ -44,7 +44,12 @@ def compute_svd(data_matrix, to_truncate):
     s_filled = np.zeros((u.shape[0], v_t.shape[0]))  # create a matrix for the eigenvalues
     s_filled[:min(u.shape[0], v_t.shape[0]), :min(u.shape[0], v_t.shape[0])] = np.diag(s)  # fill sigma with EV
     # print(u.shape, s.shape, s_filled.shape, v_t.shape)
+    print(u.shape)
+    print(v_t.shape)
     u_ = np.dot(u, s_filled)  # multiply with singular values matrix
+    v_t = np.dot(s_filled[:v_t.shape[0], :], v_t)  # multiply with singular values matrix
+    print(u_.shape)
+    print(v_t.shape)
     return u_, v_t
 
 
@@ -85,7 +90,7 @@ def replace_u(rating_list, data_mat, V_mat, lamb, k_val):
 
     new_u = np.linalg.inv(new_u)
 
-    vec_sum = np.full((k_val, ), 0.0)
+    vec_sum = np.full((k_val,), 0.0)
     for (r, c, star_rating) in rating_list:
         vec_sum += data_mat[r, c] * V_mat[:, c]
 
@@ -104,7 +109,7 @@ def replace_v(rating_list, data_mat, U_mat, lamb, k_val):
 
     new_v = np.linalg.inv(new_v)
 
-    vec_sum = np.full((k_val, ), 0.0)
+    vec_sum = np.full((k_val,), 0.0)
     for (r, c, star_rating) in rating_list:
         vec_sum += data_mat[r, c] * U_mat[r, :]
 
@@ -115,7 +120,11 @@ def replace_v(rating_list, data_mat, U_mat, lamb, k_val):
 
 weights = [100, 10, 1, 10, 100]
 loaded_matrix, given_ratings, means = load_data_movie_mean('../input/data_train.csv', weights)
-U, V = compute_svd(loaded_matrix, 41)
+
+# center the data to remove bias
+data = center_deviation_movie_mean(loaded_matrix, given_ratings)
+
+U, V = compute_svd(loaded_matrix, 10)
 
 # prepare the ratings
 ratings_row = [[] for i in range(10000)]
@@ -125,33 +134,35 @@ for (row, column, rating) in given_ratings:
     ratings_row[row].append((row, column, rating))
     ratings_col[column].append((row, column, rating))
 
-
 # set parameter k and lambda
 # k is the number of factors, lam is the regularization strength
 k = 1000
-lam = 50
-
+lam = 0.1
 
 # compute the initial loss
 old_loss = compute_loss(loaded_matrix, given_ratings, lam, U, V)
 loss = 0
 print(old_loss)
-while (abs(old_loss - loss) > 1):
+counter = 0
+while (abs(old_loss - loss) > 1 and counter < 2):
     for i in range(10000):
+        print(i)
         U[i, :] = replace_u(ratings_row[i], loaded_matrix, V, lam, k)
 
     for i in range(1000):
+        print(i)
         V[:, i] = replace_v(ratings_col[i], loaded_matrix, U, lam, k)
 
     old_loss = loss
     loss = compute_loss(loaded_matrix, given_ratings, lam, U, V)
     print(loss)
+    counter += 1
+    if counter == 2:
+        np.savetxt('checkpointU.csv', U, delimiter=',')
+        np.savetxt('checkpointV.csv', V, delimiter=',')
+        counter = int(input("new counter: "))
 
 result = np.matmul(U, V)
 
 # reverse the previous data centering and store the data in the submission file
-store_data_float(result, given_ratings)
-
-
-
-
+store_data_float(reverse_centering_deviation(result, given_ratings))
