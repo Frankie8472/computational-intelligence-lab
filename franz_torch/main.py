@@ -10,7 +10,7 @@ from fastai.collab import AdamW, MSELossFlat, load_learner, DatasetType
 class Parameters:
     def __init__(self):
         # User defined parameters
-        self.EPOCHS = 30
+        self.EPOCHS = 1
         self.BATCH_SIZE = 56
         self.EMB_SIZE = 128
         self.MAX_LR = 1e-2
@@ -73,7 +73,7 @@ def main():
     parameters = Parameters()
     fastai.device = parameters.DEVICE
 
-    print("\n== Loading Data ==")
+    print("== Loading Data ==")
     df = import_data(parameters.DATA_SET_PATH, drop_predictions=False)
     tf = import_data(parameters.RES_SET_PATH, drop_predictions=True)
 
@@ -116,18 +116,18 @@ def main():
         silent=False
     )
 
-    print("\n== Start Training ==")
+    print("== Start Training ==")
     learn.unfreeze()
     learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
     learn.export(parameters.MODEL_SAVE_PATH+parameters.MODEL_SAVE_NAME)
-    print("\n== Finished Training ==")
+    print("== Finished Training ==")
 
-    print("\n== Start Predicting ==")
+    print("== Start Predicting ==")
     learn = load_learner(path=parameters.MODEL_SAVE_PATH, file=parameters.MODEL_SAVE_NAME, test=CollabList.from_df(tf))
     y_pred, _ = learn.get_preds(ds_type=DatasetType.Test)
-    print("\n== Finished Predicting ==")
+    print("== Finished Predicting ==")
 
-    print("\n== Saving Predictions ==")
+    print("== Saving Predictions ==")
     tf['Predictions'] = y_pred.numpy()
     export_data(tf.to_numpy())
     return
