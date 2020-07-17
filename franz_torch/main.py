@@ -15,7 +15,7 @@ class Parameters:
         self.EMB_SIZE = 128
         self.MAX_LR = 1e-2
         self.WEIGHT_DECAY = 1e-1
-        self.SPLIT_VAL_RATE = 0
+        self.SPLIT_VAL_RATE = 0.2
 
         self.DATA_DIM = [10000, 1000]
         self.REG = True
@@ -97,15 +97,15 @@ def main():
         data,
         n_factors=parameters.EMB_SIZE,
         y_range=y_range,
-        wd=parameters.WEIGHT_DECAY,
+        #wd=parameters.WEIGHT_DECAY,
         use_nn=False,
-        emb_szs=None,
-        layers=None,
+        emb_szs={'user': parameters.EMB_SIZE, 'item': parameters.EMB_SIZE},
+        layers=[256, 1024, 512, 2048, 1024, 128, 256, 64],
         ps=None,
-        emb_drop=0.,
+        emb_drop=0.2,
         use_bn=True,
         bn_final=False,
-        opt_func=AdamW,
+        #opt_func=AdamW,
         loss_func=MSELossFlat(),  # CrossEntropyFlat, MSELossFlat, BCEFlat, BCEWithLogitsFlat
         metrics=None,
         true_wd=True,
