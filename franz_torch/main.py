@@ -10,12 +10,12 @@ from fastai.collab import AdamW, MSELossFlat, load_learner, DatasetType
 class Parameters:
     def __init__(self):
         # User defined parameters
-        self.EPOCHS = 1
-        self.BATCH_SIZE = 56
+        self.EPOCHS = 40
+        self.BATCH_SIZE = 128
         self.EMB_SIZE = 128
         self.MAX_LR = 1e-2
         self.WEIGHT_DECAY = 1e-1
-        self.SPLIT_VAL_RATE = 0.2
+        self.SPLIT_VAL_RATE = 0
 
         self.DATA_DIM = [10000, 1000]
         self.REG = True
