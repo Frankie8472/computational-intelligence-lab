@@ -36,6 +36,18 @@ class Parameters:
         assert os.path.isfile(self.DATA_SET_PATH), "DATA_SET_PATH points to no file"
         assert os.path.isfile(self.RES_SET_PATH), "RES_SET_PATH points to no file"
 
+'''
+def prophetic_collab_learner(data, n_factors:int=None, use_nn:bool=False, emb_szs:Dict[str,int]=None, layers:Collection[int]=None,
+                   ps:Collection[float]=None, emb_drop:float=0., y_range:OptRange=None, use_bn:bool=True,
+                   bn_final:bool=False, **learn_kwargs)->Learner:
+    "Create a Learner for collaborative filtering on `data`."
+    emb_szs = data.get_emb_szs(ifnone(emb_szs, {}))
+    u,m = data.train_ds.x.classes.values()
+    if use_nn: model = EmbeddingNN(emb_szs=emb_szs, layers=layers, ps=ps, emb_drop=emb_drop, y_range=y_range,
+                                   use_bn=use_bn, bn_final=bn_final, **learn_kwargs)
+    else:      model = EmbeddingDotBias(n_factors, len(u), len(m), y_range=y_range)
+    return CollabLearner(data, model, **learn_kwargs)
+'''
 
 def export_data(data_exp_data):
     i = 0
