@@ -3,19 +3,22 @@ import pandas as pd
 import os
 import torch
 import fastai
-from fastai.collab import CollabDataBunch, CollabList, collab_learner, data_collate
-from fastai.collab import AdamW, MSELossFlat, load_learner, DatasetType
+from fastai.collab import CollabDataBunch, CollabList, collab_learner, data_collate, CollabLearner
+from fastai.collab import AdamW, MSELossFlat, load_learner, DatasetType, Learner, OptRange, Collection, Tuple
+
+from franz_torch.model import CloudModel
 
 
 class Parameters:
     def __init__(self):
         # User defined parameters
-        self.EPOCHS = 40
+        self.EPOCHS = 120
         self.BATCH_SIZE = 128
         self.EMB_SIZE = 128
         self.MAX_LR = 1e-2
         self.WEIGHT_DECAY = 1e-1
         self.SPLIT_VAL_RATE = 0.2
+        self.PREDICT = False
 
         self.DATA_DIM = [10000, 1000]
         self.REG = True
@@ -36,18 +39,38 @@ class Parameters:
         assert os.path.isfile(self.DATA_SET_PATH), "DATA_SET_PATH points to no file"
         assert os.path.isfile(self.RES_SET_PATH), "RES_SET_PATH points to no file"
 
-'''
-def prophetic_collab_learner(data, n_factors:int=None, use_nn:bool=False, emb_szs:Dict[str,int]=None, layers:Collection[int]=None,
-                   ps:Collection[float]=None, emb_drop:float=0., y_range:OptRange=None, use_bn:bool=True,
-                   bn_final:bool=False, **learn_kwargs)->Learner:
-    "Create a Learner for collaborative filtering on `data`."
-    emb_szs = data.get_emb_szs(ifnone(emb_szs, {}))
-    u,m = data.train_ds.x.classes.values()
-    if use_nn: model = EmbeddingNN(emb_szs=emb_szs, layers=layers, ps=ps, emb_drop=emb_drop, y_range=y_range,
-                                   use_bn=use_bn, bn_final=bn_final, **learn_kwargs)
-    else:      model = EmbeddingDotBias(n_factors, len(u), len(m), y_range=y_range)
+
+def prophetic_collab_learner(
+        data,
+        parameters,
+        y_range: Tuple[float, float] = None,
+        dropout: float = 0.5,
+        output_dim: int = 1,
+        embed_dim: int = 128,
+        dnn_dims: Collection[int] = (2048, 4096, 512, 1024, 128, 256, 32, 64, 8, 16),
+        input_depth: int = 1,
+        cnn_dims: Collection[int] = (4, 8, 16, 32),
+        conv_kernel_size: Collection[int] = (3, 3),
+        pool_kernel_size: Collection[int] = (2, 2),
+        **learn_kwargs
+) -> Learner:
+    u, m = data.train_ds.x.classes.values()
+
+    model = CloudModel(
+        field_dims=(len(u), len(m)),
+        output_dim=output_dim,
+        embed_dim=embed_dim,
+        y_range=y_range,
+        dropout=dropout,
+        dnn_dims=dnn_dims,
+        input_depth=input_depth,
+        cnn_dims=cnn_dims,
+        conv_kernel_size=conv_kernel_size,
+        pool_kernel_size=pool_kernel_size
+    )
+    model.to(device=parameters.DEVICE)
     return CollabLearner(data, model, **learn_kwargs)
-'''
+
 
 def export_data(data_exp_data):
     i = 0
@@ -105,43 +128,64 @@ def main():
     )
 
     y_range = (0.5, 5.5)
-    learn = collab_learner(
+    # learn = collab_learner(
+    #     data,
+    #     n_factors=parameters.EMB_SIZE,
+    #     y_range=y_range,
+    #     # wd=parameters.WEIGHT_DECAY,
+    #     use_nn=False,
+    #     emb_szs={'user': parameters.EMB_SIZE, 'item': parameters.EMB_SIZE},
+    #     layers=[256, 1024, 512, 2048, 1024, 128, 256, 64],
+    #     ps=None,
+    #     emb_drop=0.2,
+    #     use_bn=True,
+    #     bn_final=False,
+    #     # opt_func=AdamW,
+    #     loss_func=MSELossFlat(),  # CrossEntropyFlat, MSELossFlat, BCEFlat, BCEWithLogitsFlat
+    #     metrics=None,
+    #     true_wd=True,
+    #     bn_wd=True,
+    #     train_bn=True,
+    #     path=None,
+    #     model_dir='models',
+    #     silent=False
+    # )
+
+    learn = prophetic_collab_learner(
         data,
-        n_factors=parameters.EMB_SIZE,
+        parameters,
         y_range=y_range,
-        #wd=parameters.WEIGHT_DECAY,
-        use_nn=False,
-        emb_szs={'user': parameters.EMB_SIZE, 'item': parameters.EMB_SIZE},
-        layers=[256, 1024, 512, 2048, 1024, 128, 256, 64],
-        ps=None,
-        emb_drop=0.2,
-        use_bn=True,
-        bn_final=False,
-        #opt_func=AdamW,
+        dropout=0.2,
+        output_dim=1,
+        embed_dim=parameters.EMB_SIZE,
+        dnn_dims=(128, 256, 64, 32, 8),
+        input_depth=1,
+        cnn_dims=(4, 8, 16, 32),
+
+        wd=parameters.WEIGHT_DECAY,
+        opt_func=AdamW,
         loss_func=MSELossFlat(),  # CrossEntropyFlat, MSELossFlat, BCEFlat, BCEWithLogitsFlat
-        metrics=None,
-        true_wd=True,
-        bn_wd=True,
-        train_bn=True,
-        path=None,
-        model_dir='models',
-        silent=False
+        metrics=None
     )
 
     print("== Start Training ==")
     learn.unfreeze()
+    # learn.lr_find()
+    # learn.recorder.plot()
+
     learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
-    learn.export(parameters.MODEL_SAVE_PATH+parameters.MODEL_SAVE_NAME)
+    learn.export(parameters.MODEL_SAVE_PATH + parameters.MODEL_SAVE_NAME)
     print("== Finished Training ==")
 
-    print("== Start Predicting ==")
-    learn = load_learner(path=parameters.MODEL_SAVE_PATH, file=parameters.MODEL_SAVE_NAME, test=CollabList.from_df(tf))
-    y_pred, _ = learn.get_preds(ds_type=DatasetType.Test)
-    print("== Finished Predicting ==")
+    if parameters.PREDICT:
+        print("== Start Predicting ==")
+        learn = load_learner(path=parameters.MODEL_SAVE_PATH, file=parameters.MODEL_SAVE_NAME, test=CollabList.from_df(tf))
+        y_pred, _ = learn.get_preds(ds_type=DatasetType.Test)
+        print("== Finished Predicting ==")
 
-    print("== Saving Predictions ==")
-    tf['Predictions'] = y_pred.numpy()
-    export_data(tf.to_numpy())
+        print("== Saving Predictions ==")
+        tf['Predictions'] = y_pred.numpy()
+        export_data(tf.to_numpy())
     return
 
 
