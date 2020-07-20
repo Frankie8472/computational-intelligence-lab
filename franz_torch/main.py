@@ -12,9 +12,9 @@ from franz_torch.model import CloudModel
 class Parameters:
     def __init__(self):
         # User defined parameters
-        self.EPOCHS = 120
-        self.BATCH_SIZE = 128
-        self.EMB_SIZE = 128
+        self.EPOCHS = 60
+        self.BATCH_SIZE = 64
+        self.EMB_SIZE = 512
         self.MAX_LR = 1e-2
         self.WEIGHT_DECAY = 1e-1
         self.SPLIT_VAL_RATE = 0.2

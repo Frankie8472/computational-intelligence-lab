@@ -7,21 +7,7 @@ import torch.nn.functional as F
 from fastai.layers import embedding, LongTensor
 
 
-class Net(nn.Module):
-    def __init__(self, input_size, output_size):
-        super(Net, self).__init__()
-        self.fc1 = nn.Linear(input_size, 64)
-        self.fc2 = nn.Linear(64, 64)
-        self.fc3 = nn.Linear(64, output_size)
-
-    def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
-
-
-class CloudModel(torch.nn.Module):
+class CloudModel(nn.Module):
     def __init__(
             self,
             field_dims,
@@ -35,7 +21,7 @@ class CloudModel(torch.nn.Module):
             conv_kernel_size,
             pool_kernel_size
     ):
-        super().__init__()
+        super(CloudModel, self).__init__()
         self.y_range = y_range
 
         size = embed_dim
@@ -53,6 +39,7 @@ class CloudModel(torch.nn.Module):
         self.embed_output_dim = len(field_dims) * embed_dim
         self.cnn = CNN(input_depth, cnn_dims, dropout, conv_kernel_size, pool_kernel_size)
         self.dnn = DNN(self.embed_output_dim + self.cnn_output_size, output_dim, dnn_dims, dropout)
+        self.stdlin = StandardLinear(input_size=1, output_size=1, dropout=0.5)
         self.enhance = None
 
     def forward(self, users: LongTensor, items: LongTensor):
@@ -63,6 +50,7 @@ class CloudModel(torch.nn.Module):
         inner = u * v
         inner = inner.sum(1) + self.u_bias(users).squeeze() + self.i_bias(items).squeeze()
         inner = inner.unsqueeze(-1)
+        inner = self.stdlin(inner)
 
         # Outer product
         outer = torch.einsum('bp, bq->bpq', u, v).unsqueeze(1)
@@ -86,7 +74,7 @@ class CloudModel(torch.nn.Module):
 
 class DNN(nn.Module):
     def __init__(self, input_dim, output_dim, dnn_dims, dropout, output_layer=True):
-        super().__init__()
+        super(DNN, self).__init__()
         layers = list()
         for dnn_dim in dnn_dims:
             layers.append(nn.Linear(in_features=input_dim, out_features=dnn_dim, bias=True))
@@ -104,7 +92,7 @@ class DNN(nn.Module):
 
 class CNN(nn.Module):
     def __init__(self, input_depth, cnn_dims, dropout, conv_kernel_size, pool_kernel_size):
-        super().__init__()
+        super(CNN, self).__init__()
         layers = list()
         for output_depth in cnn_dims:
             layers.append(nn.Conv2d(
@@ -124,3 +112,18 @@ class CNN(nn.Module):
 
     def forward(self, x):
         return self.cnn(x)
+
+
+class StandardLinear(nn.Module):
+    def __init__(self, input_size, output_size, dropout):
+        super(StandardLinear, self).__init__()
+        self.perceptron = nn.Linear(in_features=input_size, out_features=output_size)
+        self.prelu = nn.PReLU()
+        self.dropout = nn.Dropout(p=dropout)
+        self.bn = nn.BatchNorm1d(num_features=output_size)
+
+    def forward(self, x):
+        x = self.perceptron(x)
+        x = self.prelu(x)
+        x = self.bn(x)
+        return x
