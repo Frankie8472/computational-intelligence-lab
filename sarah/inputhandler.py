@@ -1,5 +1,8 @@
 import numpy as np
 import random
+from surprise import Dataset
+from surprise import Reader
+import pandas as pd
 
 # load the data and insert it into a matrix accordingly
 # fill empty entries with the mean of the given data
@@ -135,7 +138,6 @@ def store_data_float(result_matrix):
     asked_entries = get_asked_entries()
     for (i, j) in asked_entries:
         file.write('r' + str(i+1) + '_c' + str(j+1) + ',' + str(result_matrix[i][j]) + '\n')  # store with the same ID as the sample
-
 
 
 # randomly pick 10% of the entries for cross validation
@@ -276,4 +278,46 @@ def reverse_centering_deviation(data, ratings):
         for j in range(1000):
             data[i, j] += (user_mean[i] + movie_mean[j])
 
+    return data
+
+
+def parsef(line):
+    l1 = line.decode('utf8').split(',')
+    l2 = l1[0].split('_')
+    row = int(l2[0][1:])
+    column = int(l2[1][1:])
+    value = float(l1[1])
+    return row, column, value
+
+
+def load_data_raw():
+    items = []
+    users = []
+    ratings = []
+
+    # parse data file into three arrays
+    with open('../input/data_train.csv', 'rb') as f:
+        content = f.readlines()
+        content = content[1:]
+        for line in content:
+            if line:
+                row, column, value = parsef(line)
+                items.append(column)
+                users.append(row)
+                ratings.append(value)
+    return items, users, ratings
+
+
+def load_data_surprise():
+    items, users, ratings = load_data_raw()
+
+    # Creation of the dataframe. Column names are irrelevant.
+    ratings_dict = {'itemID': items,
+                    'userID': users,
+                    'rating': ratings}
+    df = pd.DataFrame(ratings_dict)
+
+    # The columns must correspond to user id, item id and ratings (in that order).
+    reader = Reader(rating_scale=(1, 5))
+    data = Dataset.load_from_df(df[['userID', 'itemID', 'rating']], reader=reader)
     return data
