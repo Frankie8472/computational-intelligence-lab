@@ -46,6 +46,22 @@ class CloudModel(nn.Module):
         # Get embeddings
         u, v = self.u_weight(users), self.i_weight(items)
 
+        # Extract correlations
+        ## Euclidean Distance
+
+        euclid_squared, euclid = minkovski(u, v, 2)
+        minkovski_squared_3, minkovski_3 = minkovski(u, v, 3)
+        minkovski_squared_4, minkovski_4 = minkovski(u, v, 4)
+        minkovski_squared_5, minkovski_5 = minkovski(u, v, 5)
+
+        u_squared = u.square()
+        v_squared = v.square()
+
+        sin = None
+        cos = None
+
+        pythagoras = (u_squared + v_squared).sqrt()
+
         # Inner product
         inner = u * v
         inner = inner.sum(1) + self.u_bias(users).squeeze() + self.i_bias(items).squeeze()
@@ -127,3 +143,8 @@ class StandardLinear(nn.Module):
         x = self.prelu(x)
         x = self.bn(x)
         return x
+
+
+def minkovski(u: torch.Tensor, v: torch.Tensor, p: int = 1):
+    tmp = (u - v).pow(p).sum()
+    return tmp, tmp.pow(1/p)
