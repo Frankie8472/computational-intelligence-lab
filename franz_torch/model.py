@@ -38,7 +38,7 @@ class CloudModel(nn.Module):
 
         self.embed_output_dim = len(field_dims) * embed_dim
         self.cnn = CNN(input_depth, cnn_dims, dropout, conv_kernel_size, pool_kernel_size)
-        self.dnn = DNN(self.embed_output_dim + self.cnn_output_size, output_dim, dnn_dims, dropout)
+        self.dnn = DNN(n_factors*9 + self.cnn_output_size + 5, output_dim, dnn_dims, dropout)
         self.stdlin = StandardLinear(input_size=1, output_size=1, dropout=0.5)
         self.enhance = None
 
@@ -57,8 +57,10 @@ class CloudModel(nn.Module):
         u_squared = u.square()
         v_squared = v.square()
 
-        sin = None
-        cos = None
+        sin_u = u.sin()
+        sin_v = v.sin()
+        cos_u = u.cos()
+        cos_v = v.cos()
 
         pythagoras = (u_squared + v_squared).sqrt()
 
@@ -66,26 +68,42 @@ class CloudModel(nn.Module):
         inner = u * v
         inner = inner.sum(1) + self.u_bias(users).squeeze() + self.i_bias(items).squeeze()
         inner = inner.unsqueeze(-1)
-        inner = self.stdlin(inner)
+        #inner = self.stdlin(inner)
 
         # Outer product
         outer = torch.einsum('bp, bq->bpq', u, v).unsqueeze(1)
 
         # CNN
         cnn = self.cnn(outer)
-
         # Concatenate outputs
-        concat = torch.cat((u, v, cnn), 1)
+        concat = torch.cat(
+            (
+                u,
+                v,
+                inner,
+                euclid_squared,
+                euclid,
+                u_squared,
+                v_squared,
+                sin_u,
+                sin_v,
+                cos_u,
+                cos_v,
+                pythagoras,
+                self.u_bias(users),
+                self.i_bias(items),
+                cnn
+            ),
+            1)
 
         # DNN
         dnn = self.dnn(concat)
 
         # Last step
-        x = dnn + inner
-
+        x = dnn #+ inner
         if self.y_range is not None:
             x = torch.sigmoid(x) * (self.y_range[1] - self.y_range[0]) + self.y_range[0]
-        return x
+        return torch.flatten(x)
 
 
 class DNN(nn.Module):
@@ -94,8 +112,8 @@ class DNN(nn.Module):
         layers = list()
         for dnn_dim in dnn_dims:
             layers.append(nn.Linear(in_features=input_dim, out_features=dnn_dim, bias=True))
-            layers.append(nn.PReLU())
             layers.append(nn.Dropout(p=dropout))
+            layers.append(nn.PReLU())
             layers.append(nn.BatchNorm1d(num_features=dnn_dim))
             input_dim = dnn_dim
         if output_layer:
@@ -119,8 +137,8 @@ class CNN(nn.Module):
             layers.append(nn.MaxPool2d(
                 kernel_size=pool_kernel_size,
             ))
-            layers.append(nn.PReLU())
             layers.append(nn.Dropout(p=dropout))
+            layers.append(nn.PReLU())
             layers.append(nn.BatchNorm2d(num_features=output_depth))
             input_depth = output_depth
         layers.append(nn.Flatten())
@@ -134,8 +152,8 @@ class StandardLinear(nn.Module):
     def __init__(self, input_size, output_size, dropout):
         super(StandardLinear, self).__init__()
         self.perceptron = nn.Linear(in_features=input_size, out_features=output_size)
-        self.prelu = nn.PReLU()
         self.dropout = nn.Dropout(p=dropout)
+        self.prelu = nn.PReLU()
         self.bn = nn.BatchNorm1d(num_features=output_size)
 
     def forward(self, x):
@@ -146,5 +164,5 @@ class StandardLinear(nn.Module):
 
 
 def minkovski(u: torch.Tensor, v: torch.Tensor, p: int = 1):
-    tmp = (u - v).pow(p).sum()
-    return tmp, tmp.pow(1/p)
+    tmp = (u - v).pow(p).sum(1)
+    return tmp.unsqueeze(-1), tmp.pow(1/p).unsqueeze(-1)
