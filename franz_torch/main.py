@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 import torch
+import torch.nn as nn
 import fastai
 from fastai.collab import CollabDataBunch, CollabList, collab_learner, data_collate, CollabLearner
 from fastai.collab import AdamW, MSELossFlat, load_learner, DatasetType, Learner, OptRange, Collection, Tuple
@@ -12,9 +13,12 @@ from franz_torch.model import CloudModel
 class Parameters:
     def __init__(self):
         # User defined parameters
-        self.EPOCHS = 60
+        self.CNN_DIMS = (4, 8, 16, 32)
+        self.DNN_DIMS = (128, 256, 64, 32, 8)
+        self.DROPOUT = 0.2
+        self.EPOCHS = 10
         self.BATCH_SIZE = 64
-        self.EMB_SIZE = 512
+        self.EMB_SIZE = 64
         self.MAX_LR = 1e-2
         self.WEIGHT_DECAY = 1e-1
         self.SPLIT_VAL_RATE = 0.2
@@ -68,6 +72,7 @@ def prophetic_collab_learner(
         conv_kernel_size=conv_kernel_size,
         pool_kernel_size=pool_kernel_size
     )
+
     model.to(device=parameters.DEVICE)
     return CollabLearner(data, model, **learn_kwargs)
 
@@ -155,16 +160,16 @@ def main():
         data,
         parameters,
         y_range=y_range,
-        dropout=0.2,
+        dropout=parameters.DROPOUT,
         output_dim=1,
         embed_dim=parameters.EMB_SIZE,
-        dnn_dims=(128, 256, 64, 32, 8),
+        dnn_dims=parameters.DNN_DIMS,
         input_depth=1,
-        cnn_dims=(4, 8, 16, 32),
+        cnn_dims=parameters.CNN_DIMS,
 
         wd=parameters.WEIGHT_DECAY,
         opt_func=AdamW,
-        loss_func=MSELossFlat(),  # CrossEntropyFlat, MSELossFlat, BCEFlat, BCEWithLogitsFlat
+        loss_func=nn.MSELoss(), #MSEMSELossFlat(),  # CrossEntropyFlat, MSELossFlat, BCEFlat, BCEWithLogitsFlat
         metrics=None
     )
 
