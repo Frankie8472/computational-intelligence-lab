@@ -310,7 +310,7 @@ def load_data_raw():
     ratings_asked = []
     nr_asked_ratings = int(round(len(ratings)*0.1))
     for i in range(nr_asked_ratings):
-        nr_of_ratings = int(round(len(ratings)))
+        nr_of_ratings = len(ratings)
         index = random.randint(0, nr_of_ratings-1)
         users_asked.append(users[index])
         items_asked.append(items[index])
