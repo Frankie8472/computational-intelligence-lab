@@ -332,7 +332,7 @@ def SGD_cross_validate(result: 'numpy.ndarray',
         j = items_asked[x]
         RMSE += (result[i][j] - ratings_asked[x]) ** 2
     RMSE /= len(users_asked)
-    return RMSE
+    return RMSE ** 0.5
 
 
 def load_data_surprise():
