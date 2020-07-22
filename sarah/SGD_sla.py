@@ -17,11 +17,11 @@ def run_SGD(k: int) -> ('numpy.ndarray', tuple):
     it = 100000000
 
     # load data
-    data = load_data_raw()
+    data_all = load_data_raw()
 
     global_mean = np.mean(data[2])
-    data = list(zip(data[0], data[1], data[2]))
-    validation_set = list(zip(data[3], data[4], data[5]))
+    data = list(zip(data_all[0], data_all[1], data_all[2]))
+    validation_set = list(zip(data_all[3], data_all[4], data_all[5]))
 
     U = np.random.uniform(0, 0.05, (nr_users, k))
     V = np.random.uniform(0, 0.05, (nr_movies, k))
@@ -76,7 +76,7 @@ def run_parallel(k):
 
     # cross validate
     score = SGD_cross_validate(result, validation_set)
-    output_path = 'output_data/SGD_k'+str(k)+'.csv'
+    output_path = 'output_data/SGD_k'+str(k)+'_'+str(score)+'.csv'
     store_data_float(result, output_path)
 
     end_time = time.time()
@@ -94,7 +94,8 @@ def run_parallel(k):
 
 def main():
     # number of features
-    k_arr = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+    #k_arr = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+    k_arr = [8]
 
     pool = Pool()
     results = pool.map(run_parallel, k_arr)

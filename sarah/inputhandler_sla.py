@@ -318,20 +318,16 @@ def load_data_raw():
         del users[index]
         del items[index]
         del ratings[index]
+        assert len(ratings) == nr_of_ratings - 1
     return users, items, ratings, users_asked, items_asked, ratings_asked
 
 
 def SGD_cross_validate(result: 'numpy.ndarray',
-        validation_set: tuple) -> float:
+        validation_set: list) -> float:
     RMSE = 0.
-    users_asked = validation_set[0]
-    items_asked = validation_set[1]
-    ratings_asked = validation_set[2]
-    for x in range(len(users_asked)):
-        i = users_asked[x]
-        j = items_asked[x]
-        RMSE += (result[i][j] - ratings_asked[x]) ** 2
-    RMSE /= len(users_asked)
+    for r, c, rating in validation_set:
+        RMSE += (result[r][c] - rating) ** 2
+    RMSE /= len(validation_set)
     return RMSE ** 0.5
 
 
