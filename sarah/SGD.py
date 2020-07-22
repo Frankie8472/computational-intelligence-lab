@@ -62,6 +62,7 @@ for k in k_arr:
             # update U and V matrices
             new_U_movie = U_movie + lr * (delta * V_user - reg * U_movie)
             new_V_user = V_user + lr * (delta * U_movie - reg * V_user)
+
             # update biases
             new_biasU_movie = biasU_movie + lr * (delta - reg2 * (biasU_movie + biasV_user - global_mean))
             new_biasV_user = biasV_user + lr * (delta - reg2 * (biasV_user + biasU_movie - global_mean))
