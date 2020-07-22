@@ -24,7 +24,6 @@ def run_SGD(k: int) -> ('numpy.ndarray', List[Tuple[int, int, int]]):
 
     # number of iterations
     it = 100000000
-    it = 10
 
     # load data
     data_all = util.load_data_raw()
