@@ -4,6 +4,8 @@ import random
 #from surprise import Reader
 import pandas as pd
 
+import os
+
 # load the data and insert it into a matrix accordingly
 # fill empty entries with the mean of the given data
 def load_data(filename):
@@ -308,8 +310,9 @@ def load_data_raw():
     users_asked = []
     items_asked = []
     ratings_asked = []
-    nr_of_ratings = len(ratings)
-    for i in range(int(round(nr_of_ratings*0.1))):
+    nr_asked_ratings = int(round(len(ratings)))
+    for i in range(nr_asked_ratings):
+        nr_of_ratings = int(round(len(ratings)))
         index = random.randint(0, nr_of_ratings-1)
         users_asked.append(users[index])
         items_asked.append(items[index])

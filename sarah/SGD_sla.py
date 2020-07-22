@@ -2,48 +2,6 @@ from inputhandler_sla import *
 from multiprocessing import Pool
 
 
-# regularizer for the U and V matrices
-reg = 0.08
-
-# regularizer for the biasU and biasV matrices
-reg2 = 0.04
-
-# number of features
-k_arr = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
-
-nr_users = 10000
-nr_movies = 1000
-
-pool = Pool()
-results = pool.map(parallel_main, k_arr)
-pool.close()
-pool.join()
-
-
-result_avg = np.zeros((nr_users, nr_movies))
-for r in results:
-    result_avg += result
-result_avg = np.divide(result_avg, len(k_arr))
-
-output_path = 'output_data/SGD_average_k_'+str(k_arr[0])+'-'+str(k_arr[len(k_arr)-a])+'.csv'
-store_data_float(result_avg, output_path)
-print('SGD averaged for k =' + str(k)+ ' stored in: '+str(output_path))
-
-
-def run_parallel(k):
-    SGD_result = run_SGD(k)
-    result = SGD_result[0]
-    validation_set = SGD_result[1]
-    # cross validate
-    score = SGD_cross_validate(result, validation_set)
-    print('SGD with k = ' + str(k) + ', score = ' + str(score))
-    output_path = 'output_data/SGD_k'+str(k)+'.csv'
-    store_data_float(result, output_path)
-    print('stored in: '+str(output_path))
-    return result
-
-
-
 def run_SGD(k: int) -> ('numpy.ndarray', tuple):
    # number of iterations
     it = 100000000
@@ -99,3 +57,48 @@ def run_SGD(k: int) -> ('numpy.ndarray', tuple):
     return pred, validation_set
 
 
+def run_parallel(k):
+    print('Running SGD with k='+str(k))
+    SGD_result = run_SGD(k)
+    result = SGD_result[0]
+    validation_set = SGD_result[1]
+    # cross validate
+    score = SGD_cross_validate(result, validation_set)
+    print('SGD with k = ' + str(k) + ', score = ' + str(score))
+    output_path = 'output_data/SGD_k'+str(k)+'.csv'
+    store_data_float(result, output_path)
+    print('stored in: '+str(output_path))
+    return result
+
+
+def main():
+    # regularizer for the U and V matrices
+    reg = 0.08
+
+    # regularizer for the biasU and biasV matrices
+    reg2 = 0.04
+
+    # number of features
+    k_arr = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+
+    nr_users = 10000
+    nr_movies = 1000
+
+
+    pool = Pool()
+    results = pool.map(run_parallel, k_arr)
+    pool.close()
+    pool.join()
+
+
+    result_avg = np.zeros((nr_users, nr_movies))
+    for r in results:
+        result_avg += result
+    result_avg = np.divide(result_avg, len(k_arr))
+
+    output_path = 'output_data/SGD_average_k_'+str(k_arr[0])+'-'+str(k_arr[len(k_arr)-a])+'.csv'
+    store_data_float(result_avg, output_path)
+    print('SGD averaged for k =' + str(k)+ ' stored in: '+str(output_path))
+
+if __name__ == "__main__":
+    main()
