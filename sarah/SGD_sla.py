@@ -94,8 +94,7 @@ def run_parallel(k):
 
 def main():
     # number of features
-    #k_arr = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
-    k_arr = [8]
+    k_arr = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
 
     pool = Pool()
     results = pool.map(run_parallel, k_arr)
