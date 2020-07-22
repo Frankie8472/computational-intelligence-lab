@@ -133,7 +133,7 @@ def store_data(result_matrix):
 
 # store the data according to the sample submission
 def store_data_float(result_matrix, file_name: str):
-    file = open('SarahSubmission.csv', 'w+')  # open a new file to write into
+    file = open(file_name, 'w+')  # open a new file to write into
     file.write('Id,Prediction\n')  # the header line
     asked_entries = get_asked_entries()
     for (i, j) in asked_entries:
