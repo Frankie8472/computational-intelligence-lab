@@ -1,4 +1,5 @@
 from inputhandler_sla import *
+from multiprocessing import Pool
 
 
 # regularizer for the U and V matrices
@@ -13,12 +14,25 @@ k_arr = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
 nr_users = 10000
 nr_movies = 1000
 
-result_avg = np.zeros((nr_users, nr_movies))
+pool = Pool()
+results = pool.map(parallel_main, k_arr)
+pool.close()
+pool.join()
 
-for k in k_arr:
+
+result_avg = np.zeros((nr_users, nr_movies))
+for r in results:
+    result_avg += result
+result_avg = np.divide(result_avg, len(k_arr))
+
+output_path = 'output_data/SGD_average_k_'+str(k_arr[0])+'-'+str(k_arr[len(k_arr)-a])+'.csv'
+store_data_float(result_avg, output_path)
+print('SGD averaged for k =' + str(k)+ ' stored in: '+str(output_path))
+
+
+def run_parallel(k):
     SGD_result = run_SGD(k)
     result = SGD_result[0]
-    result_avg += result
     validation_set = SGD_result[1]
     # cross validate
     score = SGD_cross_validate(result, validation_set)
@@ -26,11 +40,8 @@ for k in k_arr:
     output_path = 'output_data/SGD_k'+str(k)+'.csv'
     store_data_float(result, output_path)
     print('stored in: '+str(output_path))
+    return result
 
-result_avg = np.divide(result_avg, len(k_arr))
-output_path = 'output_data/SGD_average_k_'+str(k_arr[0])+'-'+str(k_arr[len(k_arr)-a])+'.csv'
-store_data_float(result_avg, output_path)
-print('SGD averaged for k =' + str(k)+ ' stored in: '+str(output_path))
 
 
 def run_SGD(k: int) -> ('numpy.ndarray', tuple):
