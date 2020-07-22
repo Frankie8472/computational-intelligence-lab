@@ -133,7 +133,7 @@ def store_data(result_matrix):
 
 # store the data according to the sample submission
 def store_data_float(result_matrix, file_name: str):
-    file = open('SarahSubmission.csv', 'w+')  # open a new file to write into
+    file = open(file_name, 'w+')  # open a new file to write into
     file.write('Id,Prediction\n')  # the header line
     asked_entries = get_asked_entries()
     for (i, j) in asked_entries:
@@ -308,8 +308,9 @@ def load_data_raw():
     users_asked = []
     items_asked = []
     ratings_asked = []
-    nr_of_ratings = len(ratings)
-    for i in range(int(round(nr_of_ratings*0.1))):
+    nr_asked_ratings = int(round(len(ratings)*0.1))
+    for i in range(nr_asked_ratings):
+        nr_of_ratings = int(round(len(ratings)))
         index = random.randint(0, nr_of_ratings-1)
         users_asked.append(users[index])
         items_asked.append(items[index])
@@ -317,7 +318,7 @@ def load_data_raw():
         del users[index]
         del items[index]
         del ratings[index]
-    return items, users, ratings, users_asked, items_asked, ratings_asked
+    return users, items, ratings, users_asked, items_asked, ratings_asked
 
 
 def SGD_cross_validate(result: 'numpy.ndarray',
