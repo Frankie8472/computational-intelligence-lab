@@ -19,7 +19,7 @@ def run_SGD(k: int) -> ('numpy.ndarray', tuple):
     # load data
     data_all = load_data_raw()
 
-    global_mean = np.mean(data[2])
+    global_mean = np.mean(data_all[2])
     data = list(zip(data_all[0], data_all[1], data_all[2]))
     validation_set = list(zip(data_all[3], data_all[4], data_all[5]))
 
