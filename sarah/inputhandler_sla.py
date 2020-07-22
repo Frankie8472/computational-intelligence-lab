@@ -4,8 +4,6 @@ import random
 #from surprise import Reader
 import pandas as pd
 
-import os
-
 # load the data and insert it into a matrix accordingly
 # fill empty entries with the mean of the given data
 def load_data(filename):
@@ -310,7 +308,7 @@ def load_data_raw():
     users_asked = []
     items_asked = []
     ratings_asked = []
-    nr_asked_ratings = int(round(len(ratings)))
+    nr_asked_ratings = int(round(len(ratings)*0.1))
     for i in range(nr_asked_ratings):
         nr_of_ratings = int(round(len(ratings)))
         index = random.randint(0, nr_of_ratings-1)
@@ -320,7 +318,7 @@ def load_data_raw():
         del users[index]
         del items[index]
         del ratings[index]
-    return items, users, ratings, users_asked, items_asked, ratings_asked
+    return users, items, ratings, users_asked, items_asked, ratings_asked
 
 
 def SGD_cross_validate(result: 'numpy.ndarray',
