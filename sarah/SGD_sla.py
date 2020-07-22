@@ -14,8 +14,7 @@ def run_SGD(k: int) -> ('numpy.ndarray', tuple):
     reg2 = 0.04
 
     # number of iterations
-    #it = 100000000
-    it = 10
+    it = 100000000
 
     # load data
     data = load_data_raw()
