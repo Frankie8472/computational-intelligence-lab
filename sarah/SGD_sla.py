@@ -1,12 +1,21 @@
-from inputhandler_sla import *
-from multiprocessing import Pool
-
+import numpy as np
+import random
 import time
+import inputhandler_sla as util
+from multiprocessing import Pool
+from typing import *
 
-nr_users = 10000
-nr_movies = 1000
 
-def run_SGD(k: int) -> ('numpy.ndarray', tuple):
+def run_SGD(k: int) -> ('numpy.ndarray', List[Tuple[int, int, int]]):
+    '''
+    Does SGD with given k.
+
+    :param k:
+    :returns:
+        - predicted rating matrix A
+        - validation set for cross validation which is  a list of
+            tuples (r, c, rating), s.t. A[r][c] = rating
+    '''
     # regularizer for the U and V matrices
     reg = 0.08
 
@@ -15,13 +24,14 @@ def run_SGD(k: int) -> ('numpy.ndarray', tuple):
 
     # number of iterations
     it = 100000000
+    it = 10
 
     # load data
-    data_all = load_data_raw()
-
-    global_mean = np.mean(data_all[2])
+    data_all = util.load_data_raw()
     data = list(zip(data_all[0], data_all[1], data_all[2]))
     validation_set = list(zip(data_all[3], data_all[4], data_all[5]))
+
+    global_mean = np.mean(data_all[2])
 
     U = np.random.uniform(0, 0.05, (nr_users, k))
     V = np.random.uniform(0, 0.05, (nr_movies, k))
@@ -30,9 +40,10 @@ def run_SGD(k: int) -> ('numpy.ndarray', tuple):
     biasV = np.zeros(nr_movies)
 
     lr = 0.1
+
     for s in range(it):
         if s % 10000000 == 0:
-            print(lr)
+            print('k='+str(k)+', learning rate: '+str(lr))
             lr /= 2
         d, n, v = random.choice(data)
         d, n = d-1, n-1
@@ -51,34 +62,48 @@ def run_SGD(k: int) -> ('numpy.ndarray', tuple):
         new_U_d = U_d + lr * (delta * V_n - reg * U_d)
         new_V_n = V_n + lr * (delta * U_d - reg * V_n)
         # update biases
-        new_biasU_d = biasU_d + lr * (delta - reg2 * (biasU_d + biasV_n - global_mean))
-        new_biasV_n = biasV_n + lr * (delta - reg2 * (biasV_n + biasU_d - global_mean))
+        new_biasU_d = biasU_d + lr * (delta - reg2 *
+                (biasU_d + biasV_n - global_mean))
+        new_biasV_n = biasV_n + lr * (delta - reg2 *
+                (biasV_n + biasU_d - global_mean))
 
         U[d, :] = new_U_d
         V[n, :] = new_V_n
 
         biasU[d] = new_biasU_d
         biasV[n] = new_biasV_n
-
+ 
     pred = U.dot(V.T) + biasU.reshape(-1, 1) + biasV
     pred[pred > 5.0] = 5.0
     pred[pred < 1.0] = 1.0
+    
     return pred, validation_set
 
 
-def run_parallel(k):
+def run_parallel(k: int) -> 'numpy.ndarray':
+    '''
+    Does SGD with given k. Stores predicted values in a file. Outputs
+    score (RMSE) using cross validation, execution time, and output path
+    relative to the current folder.
+
+    :param k:
+    :returns: predicted rating matrix
+    '''
     print('>>> Running SGD with k='+str(k))
     start_time = time.time()
 
-    SGD_result = run_SGD(k)
+    SGD_result = run_SGD(k) 
     result = SGD_result[0]
     validation_set = SGD_result[1]
 
     # cross validate
-    score = SGD_cross_validate(result, validation_set)
-    output_path = 'output_data/SGD_k'+str(k)+'_'+str(score)+'.csv'
-    store_data_float(result, output_path)
+    score = util.SGD_cross_validate(result, validation_set)
 
+    # write output file
+    output_path = 'output_data/SGD_k'+str(k)+'_'+str(score)+'.csv'
+    util.store_data_float(result, output_path)
+
+    # calculate execution time
     end_time = time.time()
     hours, remaining = divmod(end_time - start_time, 3600)
     minutes, seconds = divmod(remaining, 60)
@@ -92,25 +117,39 @@ def run_parallel(k):
     return result
 
 
-def main():
+def main() -> None:
+    '''
+    Does SGD using different
+    '''
     # number of features
     k_arr = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
 
+    # for each k, do SGD
     pool = Pool()
     results = pool.map(run_parallel, k_arr)
     pool.close()
     pool.join()
 
+    # average all obtained prediction matrices
     result_avg = np.zeros((nr_users, nr_movies))
     for r in results:
         result_avg += r
     result_avg = np.divide(result_avg, len(k_arr))
 
-    output_path = 'output_data/SGD_average_k_'+str(k_arr[0])+'-'+str(k_arr[len(k_arr)-1])+'.csv'
-    store_data_float(result_avg, output_path)
+    # write output file
+    output_path = ('output_data/SGD_average_k_' + str(k_arr[0]) + '-' +
+            str(k_arr[len(k_arr)-1]) + '.csv')
+    util.store_data_float(result_avg, output_path)
+
     print('......................'+
             '\nSGD averaged for k =' + str(k_arr)+
             '\nStored in: '+str(output_path))
 
+    return
+
+
 if __name__ == "__main__":
+    nr_users = 10000
+    nr_movies = 1000
+    
     main()
