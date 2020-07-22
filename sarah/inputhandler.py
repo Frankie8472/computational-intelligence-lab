@@ -291,7 +291,7 @@ def parsef(line):
 
 
 def load_data_raw():
-    items = []
+    movies = []
     users = []
     ratings = []
 
@@ -302,22 +302,22 @@ def load_data_raw():
         for line in content:
             if line:
                 row, column, value = parsef(line)
-                items.append(column)
+                movies.append(column)
                 users.append(row)
                 ratings.append(value)
-    return items, users, ratings
+    return movies, users, ratings
 
 
 def load_data_surprise():
-    items, users, ratings = load_data_raw()
+    movies, users, ratings = load_data_raw()
 
     # Creation of the dataframe. Column names are irrelevant.
-    ratings_dict = {'itemID': items,
-                    'userID': users,
-                    'rating': ratings}
+    ratings_dict = {'movie': movies,
+                    'user': users,
+                    'star_rating': ratings}
     df = pd.DataFrame(ratings_dict)
 
     # The columns must correspond to user id, item id and ratings (in that order).
     reader = Reader(rating_scale=(1, 5))
-    data = Dataset.load_from_df(df[['userID', 'itemID', 'rating']], reader=reader)
+    data = Dataset.load_from_df(df[['user', 'movie', 'star_rating']], reader=reader)
     return data
