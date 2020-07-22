@@ -106,7 +106,7 @@ def main():
         result_avg += r
     result_avg = np.divide(result_avg, len(k_arr))
 
-    output_path = 'output_data/SGD_average_k_'+str(k_arr[0])+'-'+str(k_arr[len(k_arr)-a])+'.csv'
+    output_path = 'output_data/SGD_average_k_'+str(k_arr[0])+'-'+str(k_arr[len(k_arr)-1])+'.csv'
     store_data_float(result_avg, output_path)
     print('......................'+
             '\nSGD averaged for k =' + str(k_arr)+
