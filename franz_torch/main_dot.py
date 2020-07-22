@@ -44,38 +44,6 @@ class Parameters:
         assert os.path.isfile(self.RES_SET_PATH), "RES_SET_PATH points to no file"
 
 
-def prophetic_collab_learner(
-        data,
-        parameters,
-        y_range: Tuple[float, float] = None,
-        dropout: float = 0.5,
-        output_dim: int = 1,
-        embed_dim: int = 128,
-        dnn_dims: Collection[int] = (2048, 4096, 512, 1024, 128, 256, 32, 64, 8, 16),
-        input_depth: int = 1,
-        cnn_dims: Collection[int] = (4, 8, 16, 32),
-        conv_kernel_size: Collection[int] = (3, 3),
-        pool_kernel_size: Collection[int] = (2, 2),
-        **learn_kwargs
-) -> Learner:
-    u, m = data.train_ds.x.classes.values()
-
-    model = CloudModel(
-        field_dims=(len(u), len(m)),
-        output_dim=output_dim,
-        embed_dim=embed_dim,
-        y_range=y_range,
-        dropout=dropout,
-        dnn_dims=dnn_dims,
-        input_depth=input_depth,
-        cnn_dims=cnn_dims,
-        conv_kernel_size=conv_kernel_size,
-        pool_kernel_size=pool_kernel_size
-    )
-    model.to(device=parameters.DEVICE)
-    return CollabLearner(data, model, **learn_kwargs)
-
-
 def export_data(data_exp_data):
     i = 0
     filename = '../output/franzSubmission{}.csv'.format(i)
@@ -136,51 +104,18 @@ def main():
     )
 
     y_range = (0.5, 5.5)
-    # learn = collab_learner(
-    #     data,
-    #     n_factors=parameters.EMB_SIZE,
-    #     y_range=y_range,
-    #     # wd=parameters.WEIGHT_DECAY,
-    #     use_nn=False,
-    #     emb_szs={'user': parameters.EMB_SIZE, 'item': parameters.EMB_SIZE},
-    #     layers=[256, 1024, 512, 2048, 1024, 128, 256, 64],
-    #     ps=None,
-    #     emb_drop=0.2,
-    #     use_bn=True,
-    #     bn_final=False,
-    #     # opt_func=AdamW,
-    #     loss_func=MSELossFlat(),  # CrossEntropyFlat, MSELossFlat, BCEFlat, BCEWithLogitsFlat
-    #     metrics=None,
-    #     true_wd=True,
-    #     bn_wd=True,
-    #     train_bn=True,
-    #     path=None,
-    #     model_dir='models',
-    #     silent=False
-    # )
-
-    learn = prophetic_collab_learner(
+    learn = collab_learner(
         data,
-        parameters,
+        n_factors=parameters.EMB_SIZE,
         y_range=y_range,
-        dropout=parameters.DROPOUT,
-        output_dim=1,
-        embed_dim=parameters.EMB_SIZE,
-        dnn_dims=parameters.DNN_DIMS,
-        input_depth=1,
-        cnn_dims=parameters.CNN_DIMS,
-
         wd=parameters.WEIGHT_DECAY,
+        use_nn=False,
         opt_func=AdamW,
-        loss_func=nn.MSELoss(), #MSEMSELossFlat(),  # CrossEntropyFlat, MSELossFlat, BCEFlat, BCEWithLogitsFlat
-        metrics=None
+        loss_func=MSELossFlat()
     )
 
     print("== Start Training ==")
     learn.unfreeze()
-    # learn.lr_find()
-    # learn.recorder.plot()
-
     learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
     learn.export(parameters.MODEL_SAVE_PATH + parameters.MODEL_SAVE_NAME)
     print("== Finished Training ==")

@@ -75,6 +75,7 @@ class CloudModel(nn.Module):
 
         # CNN
         cnn = self.cnn(outer)
+
         # Concatenate outputs
         concat = torch.cat(
             (
