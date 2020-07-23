@@ -5,10 +5,10 @@ import pandas as pd
 
 def export_data(data: pd.DataFrame):
     i = 0
-    filename = './csv_bunch/franzBagging{}.csv'.format(i)
+    filename = '../output/franzBagging{}.csv'.format(i)
 
     while os.path.isfile(filename):
-        filename = './csv_bunch/franzBagging{}.csv'.format(i)
+        filename = '../output/franzBagging{}.csv'.format(i)
         i += 1
 
     data.to_csv(filename, sep=",", index=False)
