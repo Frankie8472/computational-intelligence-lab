@@ -6,22 +6,19 @@ from multiprocessing import Pool
 from typing import *
 
 
-def run_SGD(k: int) -> ('numpy.ndarray', List[Tuple[int, int, int]]):
+def run_SGD(k: int, reg: float,
+        reg2: float) -> ('numpy.ndarray', List[Tuple[int, int, int]]):
     '''
-    Does SGD with given k.
+    Does SGD with given k, and regularizers reg and reg2.
 
-    :param k:
+    :param k: number of features
+    :param reg: regularizer for matrices U and V
+    :param reg2: regularizer for matrices biasU and biasV
     :returns:
         - predicted rating matrix A
         - validation set for cross validation which is  a list of
             tuples (r, c, rating), s.t. A[r][c] = rating
     '''
-    # regularizer for the U and V matrices
-    reg = 0.08
-
-    # regularizer for the biasU and biasV matrices
-    reg2 = 0.04
-
     # number of iterations
     it = 100000000
 
@@ -79,19 +76,24 @@ def run_SGD(k: int) -> ('numpy.ndarray', List[Tuple[int, int, int]]):
     return pred, validation_set
 
 
-def run_parallel(k: int) -> 'numpy.ndarray':
+def run_parallel(k_r_r2: Tuple[int, float, float]) -> 'numpy.ndarray':
     '''
-    Does SGD with given k. Stores predicted values in a file. Outputs
-    score (RMSE) using cross validation, execution time, and output path
-    relative to the current folder.
+    Does SGD with given k and regularizers r and r2. Stores predicted values
+    in a file. Outputs score (RMSE) using cross validation, execution time,
+    and output path relative to the current folder.
 
-    :param k:
+    :param k_r_r2: tuple (k, r, r2), where k is the number of features used
+        in SGD, r the regularizer for matrices U and V, and r2 the
+        regularizer for matrices biasU and biasV
     :returns: predicted rating matrix
     '''
-    print('>>> Running SGD with k='+str(k))
+    print('>>> Running SGD with k_r_r2 = '+str(k_r_r2))
     start_time = time.time()
 
-    SGD_result = run_SGD(k) 
+    k = k_r_r2[0]
+    reg = k_r_r2[1]
+    reg2 = k_r_r2[2]
+    SGD_result = run_SGD(k, reg, reg2) 
     result = SGD_result[0]
     validation_set = SGD_result[1]
 
@@ -99,7 +101,8 @@ def run_parallel(k: int) -> 'numpy.ndarray':
     score = util.SGD_cross_validate(result, validation_set)
 
     # write output file
-    output_path = 'output_data/SGD_k'+str(k)+'_'+str(score)+'.csv'
+    output_path = ('output_data/SGD_k' + str(k) + '_reg'+str(reg) + '_reg2' +
+            str(reg2) + '_' + str(score) + '.csv')
     util.store_data_float(result, output_path)
 
     # calculate execution time
@@ -108,7 +111,8 @@ def run_parallel(k: int) -> 'numpy.ndarray':
     minutes, seconds = divmod(remaining, 60)
     
     print('......................'+
-            '\nSGD with k = ' + str(k) + ', score = ' + str(score) +
+            '\nSGD with k = ' + str(k) + ', reg = ' + str(reg) +
+            ', reg2 = ' + str(reg2) + ', score = ' + str(score) +
             '\nStored in: '+str(output_path) +
             '\nExecution time: '+
             '{:0>2}:{:0>2}:{:05.2f}'.format(int(hours),int(minutes),seconds))
@@ -118,14 +122,25 @@ def run_parallel(k: int) -> 'numpy.ndarray':
 
 def main() -> None:
     '''
-    Does SGD using different
+    Does SGD using different k values
     '''
+    # Grid search values:
     # number of features
-    k_arr = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+    k_arr = [1, 50, 100, 150,
+            200, 250, 300, 350,
+            400, 450, 500, 550,
+            600, 650, 700, 750,
+            800, 850, 900, 950]
+    # regularizers should be in [0.01, 0.1], so adjust range accordingly
+    reg_arr = [0.08, 0.04]  # for matrices U and V
+    reg2_arr = reg_arr      # for matrices biasU and biasV
+    # create list of all possible k, reg, and reg2 combinations
+    combinations = [(k, r, r2) for k in k_arr for r in reg_arr
+            for r2 in reg2_arr]
 
     # for each k, do SGD
     pool = Pool()
-    results = pool.map(run_parallel, k_arr)
+    results = pool.map(run_parallel, combinations)
     pool.close()
     pool.join()
 
