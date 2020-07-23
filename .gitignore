@@ -11,3 +11,4 @@ __pycache__/
 /xDeepFMcode/
 /input/data_train.pt
 /franz_torch/models/
+/franz_torch/csv_bunch/

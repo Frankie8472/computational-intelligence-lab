@@ -102,7 +102,7 @@ def export_data(data_exp_data):
 
 
 def import_data(path, drop_predictions=False):
-    import_data_df = pd.read_csv(path)
+    import_data_df = pd.read_csv(path, low_memory=False)
     import_data_df[['userId', 'movieId']] = import_data_df['Id'].str.split("_", n=1, expand=True)
     import_data_df[['userId']] = import_data_df['userId'].str.strip("r")
     import_data_df[['movieId']] = import_data_df['movieId'].str.strip("c")
