@@ -109,6 +109,8 @@ class CloudModel(nn.Module):
         x = dnn #+ inner
         if self.y_range is not None:
             x = torch.sigmoid(x) * (self.y_range[1] - self.y_range[0]) + self.y_range[0]
+
+
         return torch.flatten(x)
 
 

@@ -138,28 +138,6 @@ def main():
     )
 
     y_range = (0.5, 5.5)
-    # learn = collab_learner(
-    #     data,
-    #     n_factors=parameters.EMB_SIZE,
-    #     y_range=y_range,
-    #     # wd=parameters.WEIGHT_DECAY,
-    #     use_nn=False,
-    #     emb_szs={'user': parameters.EMB_SIZE, 'item': parameters.EMB_SIZE},
-    #     layers=[256, 1024, 512, 2048, 1024, 128, 256, 64],
-    #     ps=None,
-    #     emb_drop=0.2,
-    #     use_bn=True,
-    #     bn_final=False,
-    #     # opt_func=AdamW,
-    #     loss_func=MSELossFlat(),  # CrossEntropyFlat, MSELossFlat, BCEFlat, BCEWithLogitsFlat
-    #     metrics=None,
-    #     true_wd=True,
-    #     bn_wd=True,
-    #     train_bn=True,
-    #     path=None,
-    #     model_dir='models',
-    #     silent=False
-    # )
 
     learn = prophetic_collab_learner(
         data,
