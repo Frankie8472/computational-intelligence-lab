@@ -13,12 +13,14 @@ from franz_torch.model import CloudModel
 class Parameters:
     def __init__(self):
         # User defined parameters
-        self.EPOCHS = 100
-        self.BATCH_SIZE = 64
-        self.EMB_SIZE = 64
+        self.EPOCHS = 10
+        self.EMB_SIZE = 128
+        self.BATCH_SIZE = 10000
         self.DROPOUT = 0.2
-        self.CNN_DIMS = (4, 8, 16, 32)
-        self.DNN_DIMS = (128, 256, 64, 32, 8)
+        self.POOL_KERNEL_SIZE = (2, 2)
+        self.CONV_KERNEL_SIZE = (2, 2)
+        self.CNN_DIMS = (4, 8)
+        self.DNN_DIMS = (2048, 1024, 512)
         self.MAX_LR = 1e-2
         self.WEIGHT_DECAY = 1e-1
         self.SPLIT_VAL_RATE = 0.2
@@ -169,6 +171,8 @@ def main():
         dnn_dims=parameters.DNN_DIMS,
         input_depth=1,
         cnn_dims=parameters.CNN_DIMS,
+        conv_kernel_size=parameters.CONV_KERNEL_SIZE,
+        pool_kernel_size=parameters.POOL_KERNEL_SIZE,
 
         wd=parameters.WEIGHT_DECAY,
         opt_func=AdamW,

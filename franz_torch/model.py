@@ -1,5 +1,5 @@
+import math
 from typing import Tuple, Collection
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -26,7 +26,7 @@ class CloudModel(nn.Module):
 
         size = embed_dim
         for i in range(0, len(cnn_dims)):
-            size = round((size - conv_kernel_size[0]) / pool_kernel_size[0])
+            size = math.floor((size - conv_kernel_size[0] + 1) / pool_kernel_size[0])
         self.cnn_output_size = size * size * cnn_dims[-1]
 
         n_users = field_dims[0]
@@ -38,7 +38,11 @@ class CloudModel(nn.Module):
 
         self.embed_output_dim = len(field_dims) * embed_dim
         self.cnn = CNN(input_depth, cnn_dims, dropout, conv_kernel_size, pool_kernel_size)
-        self.dnn = DNN(n_factors*9 + self.cnn_output_size + 5, output_dim, dnn_dims, dropout)
+
+        dnn_input_length = n_factors*9 + self.cnn_output_size + 5
+        dnn_input_length = self.cnn_output_size
+
+        self.dnn = DNN(dnn_input_length, output_dim, dnn_dims, dropout)
         self.stdlin = StandardLinear(input_size=1, output_size=1, dropout=0.5)
         self.enhance = None
 
@@ -48,7 +52,7 @@ class CloudModel(nn.Module):
 
         # Extract correlations
         ## Euclidean Distance
-
+        '''
         euclid_squared, euclid = minkovski(u, v, 2)
         minkovski_squared_3, minkovski_3 = minkovski(u, v, 3)
         minkovski_squared_4, minkovski_4 = minkovski(u, v, 4)
@@ -63,20 +67,20 @@ class CloudModel(nn.Module):
         cos_v = v.cos()
 
         pythagoras = (u_squared + v_squared).sqrt()
-
+        
         # Inner product
         inner = u * v
         inner = inner.sum(1) + self.u_bias(users).squeeze() + self.i_bias(items).squeeze()
         inner = inner.unsqueeze(-1)
         #inner = self.stdlin(inner)
-
+        '''
         # Outer product
         outer = torch.einsum('bp, bq->bpq', u, v).unsqueeze(1)
-
         # CNN
         cnn = self.cnn(outer)
 
         # Concatenate outputs
+        '''
         concat = torch.cat(
             (
                 u,
@@ -96,7 +100,8 @@ class CloudModel(nn.Module):
                 cnn
             ),
             1)
-
+        '''
+        concat = cnn
         # DNN
         dnn = self.dnn(concat)
 
