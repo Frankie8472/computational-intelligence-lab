@@ -13,9 +13,16 @@ from franz_torch.model import CloudModel
 class Parameters:
     def __init__(self):
         # User defined parameters
+        self.GRIDSEARCH_CYCLES = [1, 2, 3, 4, 5]
+        self.GRIDSEARCH_EPOCHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        self.GRIDSEARCH_BATCH_SIZE = [100, 1000, 5000, 10000, 15000, 20000]
+        self.GRIDSEARCH_EMB_SIZE = [4, 8, 16, 32, 64, 128, 256]
+
+        self.CYCLES = 2
         self.EPOCHS = 5
         self.BATCH_SIZE = 10000
         self.EMB_SIZE = 32
+
         self.DROPOUT = 0.2
         self.CNN_DIMS = (4, 8, 16, 32)
         self.DNN_DIMS = (128, 256, 64, 32, 8)
@@ -80,10 +87,7 @@ def import_data(path, drop_predictions=False):
     return import_data_df
 
 
-def main():
-    parameters = Parameters()
-    fastai.device = parameters.DEVICE
-
+def main(parameters, batch_size, epochs, cycles, emb_size):
     print("Device: {}".format(parameters.DEVICE))
     print("== Loading Data ==")
     df = import_data(parameters.DATA_SET_PATH, drop_predictions=False)
@@ -95,7 +99,7 @@ def main():
         test=None,
         seed=parameters.SEED,
         path='.',
-        bs=parameters.BATCH_SIZE,
+        bs=batch_size,
         val_bs=None,
         num_workers=parameters.WORKERS,
         dl_tfms=None,
@@ -107,7 +111,7 @@ def main():
     y_range = (0.5, 5.5)
     learn = collab_learner(
         data,
-        n_factors=parameters.EMB_SIZE,
+        n_factors=emb_size,
         y_range=y_range,
         wd=parameters.WEIGHT_DECAY,
         use_nn=False,
@@ -117,10 +121,9 @@ def main():
 
     print("== Start Training ==")
     learn.unfreeze()
-    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
-    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
-    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
-    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
+    for i in range(0, cycles):
+        learn.fit_one_cycle(cyc_len=epochs, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
+
     learn.export(parameters.MODEL_SAVE_PATH + parameters.MODEL_SAVE_NAME)
     print("== Finished Training ==")
 
@@ -137,4 +140,11 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parameters = Parameters()
+    fastai.device = parameters.DEVICE
+
+    for bs in parameters.GRIDSEARCH_BATCH_SIZE:
+        for cyc in parameters.GRIDSEARCH_CYCLES:
+            for e in parameters.GRIDSEARCH_EPOCHS:
+                for emb in parameters.GRIDSEARCH_EMB_SIZE:
+                    main(parameters, bs, e, cyc, emb)
