@@ -13,9 +13,9 @@ from franz_torch.model import CloudModel
 class Parameters:
     def __init__(self):
         # User defined parameters
-        self.EPOCHS = 100
-        self.BATCH_SIZE = 64
-        self.EMB_SIZE = 64
+        self.EPOCHS = 5
+        self.BATCH_SIZE = 10000
+        self.EMB_SIZE = 32
         self.DROPOUT = 0.2
         self.CNN_DIMS = (4, 8, 16, 32)
         self.DNN_DIMS = (128, 256, 64, 32, 8)
@@ -68,7 +68,7 @@ def export_data(data_exp_data):
 
 
 def import_data(path, drop_predictions=False):
-    import_data_df = pd.read_csv(path)
+    import_data_df = pd.read_csv(path, low_memory=False)
     import_data_df[['userId', 'movieId']] = import_data_df['Id'].str.split("_", n=1, expand=True)
     import_data_df[['userId']] = import_data_df['userId'].str.strip("r")
     import_data_df[['movieId']] = import_data_df['movieId'].str.strip("c")
@@ -84,6 +84,7 @@ def main():
     parameters = Parameters()
     fastai.device = parameters.DEVICE
 
+    print("Device: {}".format(parameters.DEVICE))
     print("== Loading Data ==")
     df = import_data(parameters.DATA_SET_PATH, drop_predictions=False)
     tf = import_data(parameters.RES_SET_PATH, drop_predictions=True)
@@ -116,6 +117,9 @@ def main():
 
     print("== Start Training ==")
     learn.unfreeze()
+    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
+    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
+    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
     learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
     learn.export(parameters.MODEL_SAVE_PATH + parameters.MODEL_SAVE_NAME)
     print("== Finished Training ==")

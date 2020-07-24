@@ -14,13 +14,13 @@ class Parameters:
     def __init__(self):
         # User defined parameters
         self.EPOCHS = 10
-        self.EMB_SIZE = 128
-        self.BATCH_SIZE = 10000
-        self.DROPOUT = 0.2
+        self.EMB_SIZE = 25
+        self.BATCH_SIZE = 5000
+        self.DROPOUT = 0.5
         self.POOL_KERNEL_SIZE = (2, 2)
         self.CONV_KERNEL_SIZE = (2, 2)
-        self.CNN_DIMS = (4, 8)
-        self.DNN_DIMS = (2048, 1024, 512)
+        self.CNN_DIMS = (128, 256)
+        self.DNN_DIMS = (128,)  # (64, 32, 64)
         self.MAX_LR = 1e-2
         self.WEIGHT_DECAY = 1e-1
         self.SPLIT_VAL_RATE = 0.2
@@ -118,6 +118,7 @@ def main():
     parameters = Parameters()
     fastai.device = parameters.DEVICE
 
+    print("Device: {}".format(parameters.DEVICE))
     print("== Loading Data ==")
     df = import_data(parameters.DATA_SET_PATH, drop_predictions=False)
     tf = import_data(parameters.RES_SET_PATH, drop_predictions=True)
@@ -154,7 +155,7 @@ def main():
 
         wd=parameters.WEIGHT_DECAY,
         opt_func=AdamW,
-        loss_func=nn.MSELoss(), #MSEMSELossFlat(),  # CrossEntropyFlat, MSELossFlat, BCEFlat, BCEWithLogitsFlat
+        loss_func=nn.MSELoss(),  # CrossEntropyFlat, MSELossFlat, BCEFlat, BCEWithLogitsFlat
         metrics=None
     )
 
@@ -163,6 +164,9 @@ def main():
     # learn.lr_find()
     # learn.recorder.plot()
 
+    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
+    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
+    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
     learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
     learn.export(parameters.MODEL_SAVE_PATH + parameters.MODEL_SAVE_NAME)
     print("== Finished Training ==")
