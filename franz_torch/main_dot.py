@@ -19,8 +19,8 @@ import pandas as pd
 import os
 import torch
 import fastai
-from fastai.collab import CollabDataBunch, CollabList, collab_learner, data_collate
-from fastai.collab import AdamW, MSELossFlat, load_learner, DatasetType, try_import
+from fastai.collab import CollabDataBunch, CollabList, collab_learner
+from fastai.collab import AdamW, MSELossFlat, load_learner, DatasetType
 
 
 class Parameters:
@@ -54,15 +54,15 @@ class Parameters:
 
         # User defined parameters for the learner
         self.CYCLES = 10
-        self.EPOCHS = 10
+        self.EPOCHS = 20
         self.BATCH_SIZE = 100
         self.EMB_SIZE = 16
-        self.MAX_LR = 1e-2
+        self.MAX_LR = 1e-1
         self.WEIGHT_DECAY = 1e-1
-        self.SPLIT_VAL_RATE = 0.1  # Automaticly set to zero if self.Predict set to True
         self.PREDICT = False
 
         # Parameters which should not have to be changed
+        self.SPLIT_VAL_RATE = 0.1  # Automatically set to zero if self.Predict set to True
         self.USE_DNN = False
         self.WORKING_PATH = "."
         self.DATA_SET_PATH = "../input/data_train.csv"
