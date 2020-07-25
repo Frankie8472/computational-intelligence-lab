@@ -13,14 +13,12 @@ from franz_torch.model import CloudModel
 class Parameters:
     def __init__(self):
         # User defined parameters
-        self.EPOCHS = 10
-        self.EMB_SIZE = 25
-        self.BATCH_SIZE = 5000
-        self.DROPOUT = 0.5
-        self.POOL_KERNEL_SIZE = (2, 2)
-        self.CONV_KERNEL_SIZE = (2, 2)
-        self.CNN_DIMS = (128, 256)
-        self.DNN_DIMS = (128,)  # (64, 32, 64)
+        self.EPOCHS = 5
+        self.BATCH_SIZE = 10000
+        self.EMB_SIZE = 32
+        self.DROPOUT = 0.2
+        self.CNN_DIMS = (4, 8, 16, 32)
+        self.DNN_DIMS = (128, 256, 64, 32, 8)
         self.MAX_LR = 1e-2
         self.WEIGHT_DECAY = 1e-1
         self.SPLIT_VAL_RATE = 0.2
@@ -44,38 +42,6 @@ class Parameters:
         # Assertions
         assert os.path.isfile(self.DATA_SET_PATH), "DATA_SET_PATH points to no file"
         assert os.path.isfile(self.RES_SET_PATH), "RES_SET_PATH points to no file"
-
-
-def prophetic_collab_learner(
-        data,
-        parameters,
-        y_range: Tuple[float, float] = None,
-        dropout: float = 0.5,
-        output_dim: int = 1,
-        embed_dim: int = 128,
-        dnn_dims: Collection[int] = (2048, 4096, 512, 1024, 128, 256, 32, 64, 8, 16),
-        input_depth: int = 1,
-        cnn_dims: Collection[int] = (4, 8, 16, 32),
-        conv_kernel_size: Collection[int] = (3, 3),
-        pool_kernel_size: Collection[int] = (2, 2),
-        **learn_kwargs
-) -> Learner:
-    u, m = data.train_ds.x.classes.values()
-
-    model = CloudModel(
-        field_dims=(len(u), len(m)),
-        output_dim=output_dim,
-        embed_dim=embed_dim,
-        y_range=y_range,
-        dropout=dropout,
-        dnn_dims=dnn_dims,
-        input_depth=input_depth,
-        cnn_dims=cnn_dims,
-        conv_kernel_size=conv_kernel_size,
-        pool_kernel_size=pool_kernel_size
-    )
-    model.to(device=parameters.DEVICE)
-    return CollabLearner(data, model, **learn_kwargs)
 
 
 def export_data(data_exp_data):
@@ -139,31 +105,18 @@ def main():
     )
 
     y_range = (0.5, 5.5)
-
-    learn = prophetic_collab_learner(
+    learn = collab_learner(
         data,
-        parameters,
+        n_factors=parameters.EMB_SIZE,
         y_range=y_range,
-        dropout=parameters.DROPOUT,
-        output_dim=1,
-        embed_dim=parameters.EMB_SIZE,
-        dnn_dims=parameters.DNN_DIMS,
-        input_depth=1,
-        cnn_dims=parameters.CNN_DIMS,
-        conv_kernel_size=parameters.CONV_KERNEL_SIZE,
-        pool_kernel_size=parameters.POOL_KERNEL_SIZE,
-
         wd=parameters.WEIGHT_DECAY,
+        use_nn=False,
         opt_func=AdamW,
-        loss_func=nn.MSELoss(),  # CrossEntropyFlat, MSELossFlat, BCEFlat, BCEWithLogitsFlat
-        metrics=None
+        loss_func=MSELossFlat()
     )
 
     print("== Start Training ==")
     learn.unfreeze()
-    # learn.lr_find()
-    # learn.recorder.plot()
-
     learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
     learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
     learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)

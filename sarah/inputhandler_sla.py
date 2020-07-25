@@ -3,6 +3,7 @@ import random
 #from surprise import Dataset
 #from surprise import Reader
 import pandas as pd
+from typing import *
 
 # load the data and insert it into a matrix accordingly
 # fill empty entries with the mean of the given data
@@ -304,35 +305,69 @@ def load_data_raw():
                 items.append(column)
                 users.append(row)
                 ratings.append(value)
-    # split for cross validation
+    return extract_validation_set(users, items, ratings, 0.1)
+
+
+def extract_validation_set(users: List[int], items: List[int],
+        ratings: List[int], percentage: float) ->  Tuple[List[int],
+                List[int], List[int], List[int], List[int], List[int]]:
+    '''
+    Extract validation set from given ratings, where
+    list(zip(users,items,ratings)) results in a list of tuples (r, c, rating),
+    where r denotes the row, c denotes the column in the rating matrix A, and
+    rating the value at A[r][c].
+
+    :param users: list of known rating row indices
+    :param items: list of known rating column indices
+    :param ratings: list of known ratings
+    :param percentage: percentage of known ratings to use for cross validation
+    :returns: A tuple of lists:
+        - list of known rating row indices not used for cross validation
+        - list of known rating column indices not used for cross validation
+        - list of known ratings not used for cross validation
+        - list of known rating row indices used for cross validation
+        - list of known rating columns indices used for cross validation
+        - list of known ratings used for cross validation
+        Note that the lists for known ratings not used for cross validation
+        and the lists for known ratings used for cross validation have the
+        same format as the input lists.
+    '''
     users_asked = []
     items_asked = []
     ratings_asked = []
-    nr_asked_ratings = int(round(len(ratings)*0.1))
+
+    nr_asked_ratings = int(round(len(ratings) * percentage))
+
     for i in range(nr_asked_ratings):
-        nr_of_ratings = int(round(len(ratings)))
+        nr_of_ratings = len(ratings)
         index = random.randint(0, nr_of_ratings-1)
+
         users_asked.append(users[index])
         items_asked.append(items[index])
         ratings_asked.append(ratings[index])
+
         del users[index]
         del items[index]
         del ratings[index]
+
     return users, items, ratings, users_asked, items_asked, ratings_asked
 
 
 def SGD_cross_validate(result: 'numpy.ndarray',
-        validation_set: tuple) -> float:
+        validation_set: List[Tuple[int, int, int]]) -> float:
+    '''
+    Compute cross validation score.
+
+    :param result: Rating matrix A
+    :param validation_set: Validation set for cross validation. List of tuples
+        (r, c, rating), s.t. A[r][c] = rating
+    :returns: root mean squared error
+    '''
     RMSE = 0.
-    users_asked = validation_set[0]
-    items_asked = validation_set[1]
-    ratings_asked = validation_set[2]
-    for x in range(len(users_asked)):
-        i = users_asked[x]
-        j = items_asked[x]
-        RMSE += (result[i][j] - ratings_asked[x]) ** 2
-    RMSE /= len(users_asked)
-    return RMSE
+    for r, c, rating in validation_set:
+        RMSE += (result[r-1][c-1] - rating) ** 2
+    RMSE /= len(validation_set)
+    return RMSE ** 0.5
 
 
 def load_data_surprise():
