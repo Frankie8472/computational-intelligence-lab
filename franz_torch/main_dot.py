@@ -53,11 +53,11 @@ class Parameters:
         """Inits ParameterClass with predefined parameters."""
 
         # User defined parameters for the learner
-        self.CYCLES = 10
-        self.EPOCHS = 20
+        self.CYCLES = 2
+        self.EPOCHS = 18
         self.BATCH_SIZE = 100
-        self.EMB_SIZE = 16
-        self.MAX_LR = 1e-1
+        self.EMB_SIZE = 128
+        self.MAX_LR = 1e-2
         self.WEIGHT_DECAY = 1e-1
         self.PREDICT = False
 
@@ -160,7 +160,7 @@ def export_data(export_data_df: pd.DataFrame):
     return
 
 
-def main():
+def main(bs, e, emb):
     """Main function.
 
     Handles the following task in the following order.
@@ -196,7 +196,7 @@ def main():
         valid_pct=parameters.SPLIT_VAL_RATE,
         seed=parameters.SEED,
         path='.',
-        bs=parameters.BATCH_SIZE,
+        bs=bs,
         num_workers=parameters.WORKERS,
         device=parameters.DEVICE,
     )
@@ -207,7 +207,7 @@ def main():
     # Initializing learner
     learn = collab_learner(
         data,
-        n_factors=parameters.EMB_SIZE,
+        n_factors=emb,
         y_range=y_range,
         wd=parameters.WEIGHT_DECAY,
         use_nn=parameters.USE_DNN,
@@ -224,7 +224,7 @@ def main():
     # Loop over cycles
     for cycle in range(0, parameters.CYCLES):
         # Train model with one cylce policy (increasing and decreasing learning rate)
-        learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
+        learn.fit_one_cycle(cyc_len=e, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
 
     # Export trained model
     learn.export(parameters.MODEL_SAVE_PATH + parameters.MODEL_SAVE_NAME)
@@ -253,4 +253,8 @@ def main():
 
 # Make sure the executed file is this one
 if __name__ == '__main__':
-    main()
+    for e in [16, 18, 20]:
+        for bs in [80, 100, 120, 500, 1000]:
+            for emb in [60, 80, 100, 120, 200]:
+                print(":::e-{}_bs-{}_emb-{}:::".format(e, bs, emb))
+                main(bs, e, emb)
