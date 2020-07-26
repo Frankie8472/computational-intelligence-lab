@@ -13,7 +13,7 @@ def export_data(export_data_df: pd.DataFrame):
     """Exports data to csv.
 
     Saves all data from DataFrame to csv. Filename is saved with an index and
-    incremented if a file with the same filname already exists.
+    incremented if a file with the same filename already exists.
 
     Args:
       export_data_df:
