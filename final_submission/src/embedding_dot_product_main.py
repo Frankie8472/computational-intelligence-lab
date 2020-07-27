@@ -37,13 +37,17 @@ class Parameters:
         self.SEED = 42
 
         # Implicit definition of parameters
-        self.DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.WORKERS = 1 if torch.cuda.is_available() else len(os.sched_getaffinity(0))
+        self.DEVICE = torch.device("cuda:0" if torch.cuda.is_available()
+                else "cpu")
+        self.WORKERS = (1 if torch.cuda.is_available()
+                else len(os.sched_getaffinity(0)))
         torch.manual_seed(self.SEED)
 
         # Assertions
-        assert os.path.isfile(self.DATA_SET_PATH), "DATA_SET_PATH points to no file"
-        assert os.path.isfile(self.RES_SET_PATH), "RES_SET_PATH points to no file"
+        assert (os.path.isfile(self.DATA_SET_PATH), "DATA_SET_PATH points to
+                no file")
+        assert (os.path.isfile(self.RES_SET_PATH), "RES_SET_PATH points to
+                no file")
 
 
 def prophetic_collab_learner(
@@ -53,7 +57,8 @@ def prophetic_collab_learner(
         dropout: float = 0.5,
         output_dim: int = 1,
         embed_dim: int = 128,
-        dnn_dims: Collection[int] = (2048, 4096, 512, 1024, 128, 256, 32, 64, 8, 16),
+        dnn_dims: Collection[int] = (2048, 4096, 512, 1024, 128, 256, 32, 64,
+            8, 16),
         input_depth: int = 1,
         cnn_dims: Collection[int] = (4, 8, 16, 32),
         conv_kernel_size: Collection[int] = (3, 3),
@@ -103,13 +108,15 @@ def export_data(data_exp_data):
 
 def import_data(path, drop_predictions=False):
     import_data_df = pd.read_csv(path, low_memory=False)
-    import_data_df[['userId', 'movieId']] = import_data_df['Id'].str.split("_", n=1, expand=True)
+    import_data_df[['userId', 'movieId']] = import_data_df['Id'].str.split(
+            "_", n=1, expand=True)
     import_data_df[['userId']] = import_data_df['userId'].str.strip("r")
     import_data_df[['movieId']] = import_data_df['movieId'].str.strip("c")
     if drop_predictions:
         import_data_df = import_data_df[['userId', 'movieId']].astype(np.long)
     else:
-        import_data_df = import_data_df[['userId', 'movieId', 'Prediction']].astype(np.long)
+        import_data_df = import_data_df[['userId', 'movieId',
+            'Prediction']].astype(np.long)
 
     return import_data_df
 
@@ -164,16 +171,21 @@ def main():
     # learn.lr_find()
     # learn.recorder.plot()
 
-    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
-    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
-    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
-    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
+    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR,
+            wd=parameters.WEIGHT_DECAY)
+    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR,
+            wd=parameters.WEIGHT_DECAY)
+    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR,
+            wd=parameters.WEIGHT_DECAY)
+    learn.fit_one_cycle(cyc_len=parameters.EPOCHS, max_lr=parameters.MAX_LR,
+            wd=parameters.WEIGHT_DECAY)
     learn.export(parameters.MODEL_SAVE_PATH + parameters.MODEL_SAVE_NAME)
     print("== Finished Training ==")
 
     if parameters.PREDICT:
         print("== Start Predicting ==")
-        learn = load_learner(path=parameters.MODEL_SAVE_PATH, file=parameters.MODEL_SAVE_NAME, test=CollabList.from_df(tf))
+        learn = load_learner(path=parameters.MODEL_SAVE_PATH,
+                file=parameters.MODEL_SAVE_NAME, test=CollabList.from_df(tf))
         y_pred, _ = learn.get_preds(ds_type=DatasetType.Test)
         print("== Finished Predicting ==")
 

@@ -26,18 +26,22 @@ class CloudModel(nn.Module):
 
         size = embed_dim
         for i in range(0, len(cnn_dims)):
-            size = math.floor((size - conv_kernel_size[0] + 1) / pool_kernel_size[0])
+            size = math.floor((size - conv_kernel_size[0] + 1) /
+                    pool_kernel_size[0])
         self.cnn_output_size = size * size * cnn_dims[-1]
 
         n_users = field_dims[0]
         n_items = field_dims[1]
         n_factors = embed_dim
-        (self.u_weight, self.i_weight, self.u_bias, self.i_bias) = [embedding(*o) for o in [
-            (n_users, n_factors), (n_items, n_factors), (n_users, 1), (n_items, 1)
-        ]]
+        (self.u_weight, self.i_weight, self.u_bias, self.i_bias) = [
+                embedding(*o) for o in [
+                    (n_users, n_factors), (n_items, n_factors), (n_users, 1),
+                    (n_items, 1)
+                ]]
 
         self.embed_output_dim = len(field_dims) * embed_dim
-        self.cnn = CNN(input_depth, cnn_dims, dropout, conv_kernel_size, pool_kernel_size)
+        self.cnn = CNN(input_depth, cnn_dims, dropout, conv_kernel_size,
+                pool_kernel_size)
 
         dnn_input_length = n_factors*9 + self.cnn_output_size + 5
         dnn_input_length = self.cnn_output_size
@@ -108,24 +112,28 @@ class CloudModel(nn.Module):
         # Last step
         x = dnn #+ inner
         if self.y_range is not None:
-            x = torch.sigmoid(x) * (self.y_range[1] - self.y_range[0]) + self.y_range[0]
+            x = (torch.sigmoid(x) * (self.y_range[1] - self.y_range[0]) +
+                    self.y_range[0])
 
 
         return torch.flatten(x)
 
 
 class DNN(nn.Module):
-    def __init__(self, input_dim, output_dim, dnn_dims, dropout, output_layer=True):
+    def __init__(self, input_dim, output_dim, dnn_dims, dropout,
+            output_layer=True):
         super(DNN, self).__init__()
         layers = list()
         for dnn_dim in dnn_dims:
-            layers.append(nn.Linear(in_features=input_dim, out_features=dnn_dim, bias=True))
+            layers.append(nn.Linear(in_features=input_dim,
+                out_features=dnn_dim, bias=True))
             layers.append(nn.Dropout(p=dropout))
             layers.append(nn.PReLU())
             layers.append(nn.BatchNorm1d(num_features=dnn_dim))
             input_dim = dnn_dim
         if output_layer:
-            layers.append(nn.Linear(in_features=input_dim, out_features=output_dim))
+            layers.append(nn.Linear(in_features=input_dim,
+                out_features=output_dim))
         self.dnn = nn.Sequential(*layers)
 
     def forward(self, x):
@@ -133,7 +141,8 @@ class DNN(nn.Module):
 
 
 class CNN(nn.Module):
-    def __init__(self, input_depth, cnn_dims, dropout, conv_kernel_size, pool_kernel_size):
+    def __init__(self, input_depth, cnn_dims, dropout, conv_kernel_size,
+            pool_kernel_size):
         super(CNN, self).__init__()
         layers = list()
         for output_depth in cnn_dims:
@@ -159,7 +168,8 @@ class CNN(nn.Module):
 class StandardLinear(nn.Module):
     def __init__(self, input_size, output_size, dropout):
         super(StandardLinear, self).__init__()
-        self.perceptron = nn.Linear(in_features=input_size, out_features=output_size)
+        self.perceptron = nn.Linear(in_features=input_size,
+                out_features=output_size)
         self.dropout = nn.Dropout(p=dropout)
         self.prelu = nn.PReLU()
         self.bn = nn.BatchNorm1d(num_features=output_size)
