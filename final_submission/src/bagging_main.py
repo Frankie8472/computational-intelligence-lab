@@ -22,16 +22,18 @@ def export_data(export_data_df: pd.DataFrame):
 
     # Initialize running variable and filename
     i = 0
-    filename = '../output/franzBagging{}.csv'.format(i)
+    filename = '../output/bagging/BACF{}_submission.csv'.format(i)
 
     # Assert filename does not exist
     while os.path.isfile(filename):
-        filename = '../output/franzBagging{}.csv'.format(i)
+        filename = '../output/bagging/BACF{}_submission.csv'.format(i)
         i += 1
 
         # Assert ratings are between 1.0 and 5.0
-        export_data_df.loc[export_data_df['Prediction'] <= 1.0, 'Prediction'] = 1.0
-        export_data_df.loc[export_data_df['Prediction'] >= 5.0, 'Prediction'] = 5.0
+        export_data_df.loc[export_data_df['Prediction'] <= 1.0,
+                'Prediction'] = 1.0
+        export_data_df.loc[export_data_df['Prediction'] >= 5.0,
+                'Prediction'] = 5.0
 
         # Export to csv
         export_data_df.to_csv(filename, index=False)
@@ -50,7 +52,7 @@ def main():
     """
 
     # Initializing parameters and empty DataFrames
-    directoryPath = "./csv_bunch/"
+    directoryPath = "../output/"
     csv_array = glob.glob(directoryPath + '*.csv')
     ret = pd.DataFrame()
     glued_data = pd.DataFrame()

@@ -30,7 +30,7 @@ class Parameters:
         self.REG = True
         self.WORKING_PATH = "."
         self.DATA_SET_PATH = "../input/data_train.csv"
-        self.RES_SET_PATH = "../output/sampleSubmission.csv"
+        self.RES_SET_PATH = "../input/sampleSubmission.csv"
         self.MODEL_SAVE_PATH = "./models/"
         self.MODEL_SAVE_NAME = "trained_model.pkl"
         self.DTYPE = torch.double
@@ -85,10 +85,10 @@ def prophetic_collab_learner(
 
 def export_data(data_exp_data):
     i = 0
-    filename = '../output/franzSubmission{}.csv'.format(i)
+    filename = '../output/adam_submission{}.csv'.format(i)
 
     while os.path.isfile(filename):
-        filename = '../output/franzSubmission{}.csv'.format(i)
+        filename = '../output/adam_submission{}.csv'.format(i)
         i += 1
 
     with open(filename, 'w') as file:

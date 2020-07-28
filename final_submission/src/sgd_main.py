@@ -39,7 +39,7 @@ def run_SGD(k: int, reg: float,
 
     for s in range(it):
         if s % 10000000 == 0:
-            print('k='+str(k)+', learning rate: '+str(lr))
+            # print('k='+str(k)+', learning rate: '+str(lr))
             lr /= 2
         d, n, v = random.choice(data)
         d, n = d-1, n-1
@@ -146,7 +146,7 @@ def main() -> None:
     result_avg = np.divide(result_avg, len(k_arr))
 
     # write output file
-    output_path = '../output/SGD_average.csv')
+    output_path = '../output/SGD_submission.csv')
     util.store_data_float(result_avg, output_path)
 
     print(  '......................'+

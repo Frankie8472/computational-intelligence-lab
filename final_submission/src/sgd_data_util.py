@@ -13,7 +13,7 @@ def get_asked_entries() -> List[Tuple[int, int]]:
         index and c i the column index of the asked entry
     '''
     asked_entries = []
-    with open('../output/sampleSubmission.csv', 'r') as sample_file:
+    with open('../input/sampleSubmission.csv', 'r') as sample_file:
         sample_file.readline()  # throw the header away
         for line in sample_file:
             entry, prediction = line.split(',')
@@ -39,7 +39,7 @@ def store_data_float(result_matrix: 'numpy.ndarray', file_name: str) -> None:
                 str(result_matrix[i][j]) + '\n')  # store with the same ID as the sample
 
 
-        def parsef(line: str) -> Tuple[int, int, int]:
+def parsef(line: str) -> Tuple[int, int, int]:
     '''
     Parse a line in input data/submission format.
 
