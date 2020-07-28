@@ -20,7 +20,7 @@ def run_SGD(k: int, reg: float,
             tuples (r, c, rating), s.t. A[r][c] = rating
     """
     # number of iterations
-    it = 100000000
+    nr_of_iterations = 100000000
 
     # load data
     data_all = util.load_data_separated()
@@ -37,8 +37,8 @@ def run_SGD(k: int, reg: float,
 
     lr = 0.1
 
-    for s in range(it):
-        if s % 10000000 == 0:
+    for iteration in range(nr_of_iterations):
+        if iteration % 10000000 == 0:
             # print('k='+str(k)+', learning rate: '+str(lr))
             lr /= 2
         user, item, rating = random.choice(data)
@@ -86,9 +86,9 @@ def run_parallel(k_r_r2: Tuple[int, float, float]) -> 'numpy.ndarray':
     k = k_r_r2[0]
     reg = k_r_r2[1]
     reg2 = k_r_r2[2]
-    SGD_result = run_SGD(k, reg, reg2)
-    result = SGD_result[0]
-    validation_set = SGD_result[1]
+    sgd_result = run_SGD(k, reg, reg2)
+    result = sgd_result[0]
+    validation_set = sgd_result[1]
 
     # cross validate
     score = util.SGD_cross_validate(result, validation_set)
@@ -108,9 +108,9 @@ def run_parallel(k_r_r2: Tuple[int, float, float]) -> 'numpy.ndarray':
 
 
 def main() -> None:
-    '''
+    """
     Does SGD using different k values
-    '''
+    """
     # Grid search values:
     # number of features
     k_arr = [
