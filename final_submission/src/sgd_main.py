@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 import random
 import time
 import sgd_data_util as util
@@ -27,13 +27,13 @@ def run_SGD(k: int, reg: float,
     data = list(zip(data_all[0], data_all[1], data_all[2]))
     validation_set = list(zip(data_all[3], data_all[4], data_all[5]))
 
-    data_mean = numpy.mean(data_all[2])
+    data_mean = np.mean(data_all[2])
 
-    em_u = numpy.random.uniform(0, 0.05, (nr_users, k))
-    em_v = numpy.random.uniform(0, 0.05, (nr_movies, k))
+    em_u = np.random.uniform(0, 0.05, (nr_users, k))
+    em_v = np.random.uniform(0, 0.05, (nr_movies, k))
 
-    bias_u = numpy.zeros(nr_users)
-    bias_v = numpy.zeros(nr_movies)
+    bias_u = np.zeros(nr_users)
+    bias_v = np.zeros(nr_movies)
 
     lr = 0.1
 
@@ -134,10 +134,10 @@ def main() -> None:
     pool.join()
 
     # average all obtained prediction matrices
-    result_avg = numpy.zeros((nr_users, nr_movies))
+    result_avg = np.zeros((nr_users, nr_movies))
     for r in results:
         result_avg += r
-    result_avg = numpy.divide(result_avg, len(k_arr))
+    result_avg = np.divide(result_avg, len(k_arr))
 
     # write output file
     output_path = '../output/SGD_submission.csv'
