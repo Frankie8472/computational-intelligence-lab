@@ -29,15 +29,16 @@ def export_data(export_data_df: pd.DataFrame):
         filename = '../output/bagging/BACF{}_submission.csv'.format(i)
         i += 1
 
-        # Assert ratings are between 1.0 and 5.0
-        export_data_df.loc[export_data_df['Prediction'] <= 1.0,
-                'Prediction'] = 1.0
-        export_data_df.loc[export_data_df['Prediction'] >= 5.0,
-                'Prediction'] = 5.0
+    # Assert ratings are between 1.0 and 5.0
+    export_data_df.loc[export_data_df['Prediction'] <= 1.0,
+            'Prediction'] = 1.0
+    export_data_df.loc[export_data_df['Prediction'] >= 5.0,
+            'Prediction'] = 5.0
 
-        # Export to csv
-        export_data_df.to_csv(filename, index=False)
-        return
+    # Export to csv
+    export_data_df.to_csv(filename, index=False)
+    print("File saved to: " + str(filename))
+    return
 
 
 def main():
