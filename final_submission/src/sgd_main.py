@@ -124,6 +124,7 @@ def main() -> None:
             8 ,9, 10, 11,
             12, 13, 14, 15,
             16, 17]
+
     # regularizers should be in [0.01, 0.1], so adjust range accordingly
     # for U and V:
     reg_arr = [0.09]
@@ -146,7 +147,7 @@ def main() -> None:
     result_avg = np.divide(result_avg, len(k_arr))
 
     # write output file
-    output_path = '../output/SGD_submission.csv')
+    output_path = '../output/SGD_submission.csv'
     util.store_data_float(result_avg, output_path)
 
     print(  '......................'+
