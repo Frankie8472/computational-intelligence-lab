@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import random
+from typing import *
 
 import data_util as util
 
@@ -9,8 +10,8 @@ STEP 1: What value(s) should we use for unknown ranking?
 Using cross validation, we compare the score of different approaches.
 '''
 
-def fill(A: 'numpy.ndarray', ratings: set, data_path: str, users: int,
-        movies: int) -> 'numpy.ndarray':
+def fill(A: np.ndarray, ratings: Set[Tuple[int, int, int]],
+        data_path: str, users: int, movies: int) -> 'numpy.ndarray':
     '''
     This function is called by run.py to fill unknown ratings with values.
 
@@ -26,8 +27,8 @@ def fill(A: 'numpy.ndarray', ratings: set, data_path: str, users: int,
     return A
 
 
-def same_value(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
-        data_path: str) -> 'numpy.ndarray':
+def same_value(A: 'numpy.ndarray', ratings: Set[Tuple[int, int, int]],
+        users: int, movies: int, data_path: str) -> 'numpy.ndarray':
     '''
     Use same value for all unknowns.
 
@@ -44,8 +45,8 @@ def same_value(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
     return A
 
 
-def mean_of_all(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
-        data_path: str) -> 'numpy.ndarray':
+def mean_of_all(A: 'numpy.ndarray', ratings: Set[Tuple[int, int, int]],
+        users: int, movies: int, data_path: str) -> 'numpy.ndarray':
     '''
     Use mean of all known values.
 
@@ -65,8 +66,8 @@ def mean_of_all(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
     return A
 
 
-def mean_of_user(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
-        data_path: str) -> 'numpy.ndarray':
+def mean_of_user(A: 'numpy.ndarray', ratings: Set[Tuple[int, int, int]],
+        users: int, movies: int, data_path: str) -> 'numpy.ndarray':
     '''
     Use mean of each user.
 
@@ -87,8 +88,8 @@ def mean_of_user(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
     return A
 
 
-def mean_of_movie(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
-       data_path: str) -> 'numpy.ndarray':
+def mean_of_movie(A: 'numpy.ndarray', ratings: Set[Tuple[int, int, int]],
+        users: int, movies: int, data_path: str) -> 'numpy.ndarray':
     '''
     Use mean of each movie.
 
@@ -109,8 +110,9 @@ def mean_of_movie(A: 'numpy.ndarray', ratings: set, users: int, movies: int,
     return A
 
 
-def mean_of_movie_adjusted(A: 'numpy.ndarray', ratings: set, users: int,
-        movies: int, data_path: str) -> 'numpy.ndarray':
+def mean_of_movie_adjusted(A: 'numpy.ndarray',
+        ratings: Set[Tuple[int, int, int]], users: int, movies: int,
+        data_path: str) -> 'numpy.ndarray':
     '''
     Use mean of each movie. Increase all ratings of a user if they rated
     enough movies (above a certain threshold) and their average is >=4.
