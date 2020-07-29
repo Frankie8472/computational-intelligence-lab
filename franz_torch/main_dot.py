@@ -53,7 +53,7 @@ class Parameters:
         """Inits ParameterClass with predefined parameters."""
 
         # User defined parameters for the learner
-        self.CYCLES = 2
+        self.CYCLES = 1
         self.EPOCHS = 18
         self.BATCH_SIZE = 100
         self.EMB_SIZE = 128
@@ -108,7 +108,7 @@ def import_data(path: str, drop_predictions: bool = False):
       If drop_predictions is False, second DataFrame has no use here
 
       For train example:
-      original_tf['Predictions'] = y_pred.numpy()
+      original_tf['Prediction'] = y_pred.numpy()
     """
 
     # Import csv
@@ -131,7 +131,7 @@ def import_data(path: str, drop_predictions: bool = False):
     return import_data_df, original_id_df
 
 
-def export_data(export_data_df: pd.DataFrame):
+def export_data(export_data_df: pd.DataFrame, e, bs, emb):
     """Exports data to csv.
 
     Saves all data from DataFrame to csv. Filename is saved with an index and
@@ -144,11 +144,11 @@ def export_data(export_data_df: pd.DataFrame):
 
     # Initialize running variable and filename
     i = 0
-    filename = '../output/franzSubmission{}.csv'.format(i)
+    filename = '../output/franzSubmission:bs-{}_e-{}_emb-{}:"{}.csv'.format(e, bs, emb, i)
 
     # Assert filename does not exist
     while os.path.isfile(filename):
-        filename = '../output/franzSubmission{}.csv'.format(i)
+        filename = '../output/franzSubmission:bs-{}_e-{}_emb-{}:"{}.csv'.format(e, bs, emb, i)
         i += 1
 
     # Assert ratings are between 1.0 and 5.0
@@ -160,7 +160,7 @@ def export_data(export_data_df: pd.DataFrame):
     return
 
 
-def main(bs, e, emb):
+def main(e, bs, emb, cyc):
     """Main function.
 
     Handles the following task in the following order.
@@ -222,7 +222,7 @@ def main(bs, e, emb):
     learn.unfreeze()
 
     # Loop over cycles
-    for cycle in range(0, parameters.CYCLES):
+    for cycle in range(0, cyc):
         # Train model with one cylce policy (increasing and decreasing learning rate)
         learn.fit_one_cycle(cyc_len=e, max_lr=parameters.MAX_LR, wd=parameters.WEIGHT_DECAY)
 
@@ -246,15 +246,15 @@ def main(bs, e, emb):
         print("== Saving Predictions ==")
 
         # Export predicted values for test set in csv
-        original_tf['Predictions'] = y_pred.numpy()
-        export_data(original_tf)
+        original_tf['Prediction'] = y_pred.numpy()
+        export_data(original_tf, e, bs, emb)
     return
 
 
 # Make sure the executed file is this one
 if __name__ == '__main__':
-    for e in [16, 18, 20]:
-        for bs in [80, 100, 120, 500, 1000]:
-            for emb in [60, 80, 100, 120, 200]:
-                print(":::e-{}_bs-{}_emb-{}:::".format(e, bs, emb))
-                main(bs, e, emb)
+    for e in [3, 4, 5]:
+        for bs in [20000, 30000, 50000, 70000]:
+            for emb in [8, 30, 100, 120, 160, 200, 220]:
+                print(":::bs-{}_e-{}_emb-{}:::".format(e, bs, emb))
+                main(bs, e, emb, cyc=2)
