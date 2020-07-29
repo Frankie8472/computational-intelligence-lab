@@ -120,9 +120,9 @@ def main() -> None:
 
     # regularizers should be in [0.01, 0.1], so adjust range accordingly
     # for U and V:
-    reg_arr = [0.09]
+    reg_arr = [0.08]
     # for biasU and biasV
-    reg2_arr = [0.05]
+    reg2_arr = [0.04]
     # create list of all possible k, reg, and reg2 combinations
     combinations = [(k, r, r2) for k in k_arr for r in reg_arr
                     for r2 in reg2_arr]
