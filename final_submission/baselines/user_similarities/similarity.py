@@ -75,12 +75,6 @@ def get_input_user(data: pd.DataFrame):
 
     :returns: The input data, current user index, the ratings of the current user
     """
-    #debug = [9301, 5617, 4916, 3678,]
-#
-    #for i in debug:
-    #    yield data, i, data[data.userId == i]
-    #return
-
     sizes = data.groupby(['userId']).userId.agg('count').to_frame('c')
     sizes = sizes.sort_values(by="c", ascending=False).reset_index()
     for i in sizes["userId"]:
@@ -188,9 +182,8 @@ def task(arg):
 
 def main():
     print("Reading data...")
-    df = import_data('../../../input/data_train.csv')
-    # TODO: find where this file is in the final submission
-    df_pred = import_data('../../../output/sampleSubmission.csv')
+    df = import_data('../../input/data_train.csv')
+    df_pred = import_data('../../input/sampleSubmission.csv')
 
     print("Running threads...")
     predictions = {}
