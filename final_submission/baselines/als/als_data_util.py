@@ -2,6 +2,24 @@ import numpy as np
 import random
 from typing import *
 
+def get_asked_entries() -> List[Tuple[int, int]]:
+    """
+    Return a list of entries that should be predicted.
+
+    :returns: List of tuples (r, c) for each asked entry, where r is the row
+        index and c i the column index of the asked entry
+    """
+    asked_entries = []
+    with open('../../input/sampleSubmission.csv', 'r') as sample_file:
+        sample_file.readline()  # throw the header away
+        for line in sample_file:
+            entry, prediction = line.split(',')
+            row_entry, column_entry = entry.split('_')
+            row = int(row_entry[1:])
+            column = int(column_entry[1:])
+            asked_entries.append((row-1, column-1))
+    return asked_entries
+
 
 def store_data_float(result_matrix: 'numpy.ndarray', file_name: str) -> None:
     """

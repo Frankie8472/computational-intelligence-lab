@@ -1,12 +1,7 @@
-## Alternating Least Squares
-# lambda = 50 seems to be the best parameter (needs to be verified)
-# k=41 is taken from the weighted_movie_mean_svd (the nr of singular values that were kept)
-# data centering (even with shrinking) makes the score worse (remove this before further work)
-
-from sarah.inputhandler import *
 from typing import *
 import random
 import numpy as np
+import als_data_util as util
 
 
 # compute the regularized Frobenius loss
@@ -59,7 +54,10 @@ def replace(rating_list: List[Tuple[int, int, int]],
     new_v = np.full((k_val, k_val), 0.0)
 
     for (r, c, star_rating) in rating_list:
-        new_v += np.outer(U_mat[r, :], U_mat[r, :])
+        if v:
+            new_v += np.outer(U_mat[r, :], U_mat[r, :])
+        else:
+            new_v += np.outer(U_mat[:, c], U_mat[:, c])
 
     new_v = np.add(new_v, lamb * np.identity(k_val))
 
@@ -82,11 +80,11 @@ def main() -> None:
     Do Alternating Least Squares.
     '''
     # load the data
-    data, ratings, means = load_data_movie_mean('../input/data_train.csv',
-            [100, 10, 1, 10, 100])
+    data, ratings, means = util.load_data_movie_mean(
+            '../../input/data_train.csv', [100, 10, 1, 10, 100])
 
     # center the data to remove bias
-    data = center_deviation_movie_mean(data, ratings)
+    data = util.center_deviation_movie_mean(data, ratings)
 
     # prepare the ratings
     ratings_row = [[] for i in range(10000)]
@@ -135,9 +133,9 @@ def main() -> None:
     # reverse the previous data centering and store the data in the
     # submission file
     output_path = 'output/als_prediction.csv'
-    store_data_float(reverse_centering_deviation(result, ratings),
+    util.store_data_float(util.reverse_centering_deviation(result,ratings),
             output_path)
 
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     main()
