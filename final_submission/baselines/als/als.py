@@ -132,7 +132,7 @@ def main() -> None:
 
     # reverse the previous data centering and store the data in the
     # submission file
-    output_path = 'output/als_prediction.csv'
+    output_path = 'output/als_submission.csv'
     util.store_data_float(util.reverse_centering_deviation(result,ratings),
             output_path)
 
