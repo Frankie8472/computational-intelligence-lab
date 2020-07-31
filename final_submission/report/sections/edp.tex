@@ -1,0 +1,9 @@
+\subsection{\ac{EDP} \cite{gupta_2020}}\label{sec: edp}
+
+Instead of considering the full rating matrix, we generate random vectors $u, v\in \mathbb{R}^{k}$ and biases $bu, bv\in \mathbb{R}$ for each user and item respectively, the so-called embeddings. The rating of user $i$ for item $j$ can then be calculated as: 
+\begin{equation}
+    \hat{r}_{i,j} = u_{i} \cdot v_{j} + bu_i + bv_j
+\end{equation}
+By performing this procedure on all users and items, we obtain two matrices $U\in \mathbb{R}^{m \times k}$ and $V\in \mathbb{R}^{k \times n}$, and two vectors $bU\in \mathbb{R}^{m}$ and $bV\in \mathbb{R}^{n}$.
+
+The loss can be calculated using any loss function, for example the \ac{RMSE}, by comparing the prediction $\hat{r}_{i,j}$ to the actual given rating $r_{i,j}$. The goal is to minimize the calculated loss by adapting the embedding matrices using some optimization technique. 

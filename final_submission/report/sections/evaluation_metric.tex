@@ -1,0 +1,7 @@
+\subsection{Evaluation Metric}
+
+The \ac{RMSE} was used as evaluation metric. Assume that $r_{u,i}$ denotes the actual rating a user $u$ provided for an item $i$, and that $\hat{r}_{u,i}$ denotes the rating predicted by an algorithm, for the same entry. Let $Q$ be the set of matrix entries to be predicted, consisting of tuples \textit{(user, item)}. The \ac{RMSE} is then computed as 
+
+\begin{equation}
+    RMSE = \sqrt{\dfrac{\sum_{u,i\in Q} (r_{u,i}-\hat{r}_{u,i})^2}{|Q|}}
+\end{equation}

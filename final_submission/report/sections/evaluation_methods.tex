@@ -1,0 +1,9 @@
+\subsection{Evaluation Methods}
+
+\subsubsection{Submitting to Kaggle}
+
+The Kaggle submission page asks for a list of 1'176'952 ratings (\raisebox{-0.7ex}{\~{}}13\% of all unknown ratings), none of which occur in the initial data set, and calculates a public score (\ac{RMSE}), based on approximately 50\% of the submitted ratings. Which half of the submitted data is evaluated for the public leaderboard is undisclosed.
+
+\subsubsection{Cross Validation}
+
+In addition to submitting ratings to Kaggle, cross validation was used to estimate how accurately our predictive models will perform in practice. For $0<x<100$, cross validation splits the given data uniformly at random into a training set, containing $(100-x)\%$ of the known ratings and a validation set, containing the remaining $x\%$. The training set is used for training our models, outputting a prediction matrix. The validation set is used to assess the prediction matrix using an evaluation metric. Splitting the data into disjoint training and validation sets ensures that the model does not train on the validation set. This helps to detect and prevent overfitting on the whole set. We have chosen $x=10$, and to further improve accuracy, cross validation was repeated several times using the same prediction model, parameters and input data, resulting in one \ac{RMSE} per repetition. The final \ac{RMSE} approximation is then calculated as the mean error over all runs.

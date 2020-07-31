@@ -1,0 +1,10 @@
+\subsubsection{\ac{ALS}}
+
+\ac{ALS} is an optimization technique for factor matrices $U$ and $V$. In every iteration alternately either $U$ or $V$ is fixed and the other is being adjusted. The matrices are updated using the following equations, where $\lambda$ is a regularization factor:
+\begin{equation}
+    U = (VV^T + \lambda I)^{-1}VA^T
+\end{equation}
+\begin{equation}
+    V = (UU^T + \lambda I)^{-1}UA
+\end{equation}
+In each iteration the error can either decrease or remain unchanged and thus, it guarantees convergence to a local minimum and a minimal \ac{RMSE}.

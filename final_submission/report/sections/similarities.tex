@@ -1,0 +1,15 @@
+\subsubsection{\ac{KNN}}
+
+
+%People with similar taste tend to like similar items. The probability is therefore high that a user likes an item which another user with similar taste liked. This property can be exploited for collaborative filtering.
+
+\ac{KNN}\cite{chae2018identifying} can be used to exploit the similarity in item preferences of users. The key technique of this algorithm is to find the k-most similar users (neighbors) for a given user $u$ based on items that $u$ has already rated\cite{zeng2004similarity}. These neighbors probably have a similar taste to $u$.
+
+Our baseline calculates the similarity $s\in [-1,1]$ between two users $u$ and $\hat{u}$ based on the Pearson correlation (\ref{eq:pearson}), where $s=1$ denotes a high and $s=-1$ a low similarity. $r_{u,i}$ represent the rating of item $i$ of user $u$, similarly $r_{\hat{u},i}$ represents the rating of user $\hat{u}$. $\bar{r}_{u}$ and $\bar{r}_{\hat{u}}$ denote the mean of all ratings of the corresponding user. The k-nearest neighbors are the k users with the highest similarity.
+\begin{equation}
+    s = \frac{\sum_{i=1}^{n}(r_{u,i} - \bar{r}_{u})(r_{\hat{u},i} - \bar{r}_{\hat{u}})}{\sqrt{\sum_{i=1}^{n}(r_{u,i} - \bar{r}_{u})^2}\sqrt{\sum_{i=1}^{n}(r_{\hat{u},i} - \bar{r}_{\hat{u}})^2}}
+    \label{eq:pearson}
+\end{equation}
+For every item rated by the k-nearest neighbors we weight the corresponding rating by its similarity $s$ with user $u$. The weighted ratings are then added together and normalized. This gives us the rating predictions of items for user $u$.
+
+\ac{KNN} cannot predict ratings for items not rated by the neighbors, thus the resulting prediction matrix is very sparse, so we replaced the missing ratings with the mean of all ratings of the input data.

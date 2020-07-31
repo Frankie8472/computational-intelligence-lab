@@ -1,0 +1,8 @@
+\section{Introduction}
+Many applications use recommender systems to analyze the user's pattern of interest in items to provide personalized recommendations. Especially commercial applications such as media streaming services and online stores rely on recommender systems to suggest content with high personal value to the user, enhancing user experience and thus increasing the company's revenue.
+
+Collaborative filtering represents a type of algorithmic selection. It exploits collective data from many users to generalize across users and possibly across items. This technique can be used to build recommender systems that give suggestions to a user on the basis of the likes and dislikes of similar users.
+
+We present BACF, an alternative approach to bootstrap aggregation-based collaborative filtering. It extends the traditional \ac{EDP} algorithm\cite{gupta_2020} using two different optimizers, namely \ac{SGD} and Adam, each using a different strategy to adapt the \ac{LR}. The resulting rating predictions of these two algorithms are combined by an approach made popular in 1994 by Breiman\cite{breiman}, known as \textit{bagging} or \textit{bootstrap aggregation}, where the two prediction matrices are averaged to receive a combined result matrix. BACF does not only apply this method on different models, but also explores the possibility to similarly combine results from the same model using different parameters.
+
+We compared BACF to three different baseline algorithms: \ac{KNN}, \ac{SVD}, and \ac{ALS}. 

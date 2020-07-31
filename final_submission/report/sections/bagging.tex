@@ -1,0 +1,3 @@
+\subsection{Bootstrap Aggregation}\label{sec:bagging}
+
+The last step in our model was to combine the two procedures described in Sections \ref{sec:sgd} and \ref{sec:adam}. The foundation was presented as bagging (or bootstrap aggregation) by Breiman\cite{breiman}. We call the resulting algorithm \ac{BACF}. The final prediction matrix is obtained by calculating the average over the two rating matrices output by the \ac{EDP} with \ac{SGD} and \ac{EDP} with Adam models.

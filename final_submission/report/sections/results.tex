@@ -1,0 +1,40 @@
+\section{Results}
+\label{sec:results}
+% When reporting computational or measurement results, always report the mean (average value) along with a measure of variability (standard deviation(s) or standard error of the mean).
+% \todo[inline]{Show evidence to support the claims from the introduction}
+
+The table below summarizes the best public Kaggle scores we achieved in our implementations.
+
+\begin{center}
+ \begin{tabular}{| l | c|} 
+ \hline
+  Algorithm & Score \\ [0.5ex] 
+ \hline\hline
+ \ac{KNN} & 1.12769 \\ 
+ \hline
+ \ac{SVD} & 1.00636 \\
+ \hline
+ \ac{ALS} & 1.04141 \\
+ \hline
+ \ac{EDP} with \ac{SGD}, LR = 0.1, k = 17 & 1.03843 \\
+ \hline
+ \ac{EDP} with \ac{SGD}, adaptive LR & 0.97967 \\
+ \hline
+ \ac{EDP} with \ac{SGD}, adapt. LR, k $\in$ [8,17] & 0.97728 \\
+ \hline
+ \ac{EDP} with Adam, high batchsize & 0.98459 \\
+ \hline
+ \ac{EDP} with Adam, low batchsize & 0.98056 \\
+ \hline
+ \ac{EDP} with Adam, averaging all batchsizes & 0.97781 \\
+ \hline
+ 
+ BACF & 0.97438 \\
+ \hline
+\end{tabular}
+\end{center}
+
+We have found that \ac{EDP} combined with simple \ac{SGD}, where the \ac{LR} and k is fixed, already outperforms \ac{ALS} and \ac{KNN}. SVD performed better, however the potential for further improvement appeared to be more limited. Using EDP with SGD combined with an adaptive \ac{LR}, as described in Section \ref{sec:sgd_lr}, improves the score significantly, outperforming SVD. Using both an adaptive \ac{LR} and averaging over $k$, as explained in Section \ref{sec:sgd_k}, improved the score further.
+The score for \ac{EDP} in combination with Adam is comparable to the score obtained from optimizing the \ac{EDP} with \ac{SGD} approach. Thus, it also outperforms all baseline algorithms. 
+Combining the scores of results obtained from setting different batch sizes in \ac{EDP} with Adam resulted in an even better score and was even less prone to overfitting.
+We have found that combining the results from the two approaches, EDP with SGD with an adaptive \ac{LR} and multiple k values and EDP with Adam using a low batch size, using bootstrap aggregation (BACF), as described in Section \ref{sec:bagging}, lead to the highest score improvement, resulting in a score of 0.97438.

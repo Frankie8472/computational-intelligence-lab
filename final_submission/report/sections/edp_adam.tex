@@ -1,0 +1,20 @@
+\subsection{EDP with Adam}\label{sec:adam}
+In the following subsection, we present various techniques to improve the accuracy of the \ac{EDP} and call the implementation of those "EDP with Adam".
+
+\subsubsection{Adam}
+The Adam (adaptive moment estimation) optimizer \cite{kingma2014adam} can be interpreted as a combination of RMSprop\cite{ruder2016overview} and \ac{SGD}, while also including the momentum. It uses squared gradients to scale the \ac{LR}, like RMSprop, and takes advantage of the momentum by using the moving average of the gradient, as opposed to the gradient itself, like \ac{SGD} with momentum does. Since it is an adaptive \ac{LR} method, it computes individual \ac{LR}s for different parameters. Adam uses estimations of first and second moments of gradient to adapt the \ac{LR} for each weight.
+
+\subsubsection{The One-Cycle Policy}
+Smith\cite{smith} describes an approach to reach a better optimum faster by adjusting batch size and \ac{LR}. In his paper, he suggests to apply the one-cycle policy to \ac{LR}s.
+This cycle consists of two steps. During the first step, the \ac{LR} is linearly increased starting from the lowest rate, which is $1/25^{th}$ of a previously defined maximum \ac{LR}, until the maximum is reached (after approximately half of all epochs). During the second step, the \ac{LR} is linearly decreased from the highest \ac{LR} to the lowest. At this point a few training epochs still remain, during which the \ac{LR} is further decreased to $1/100^{th}$ of the highest \ac{LR} to reach a better local optimum.
+
+The motivation behind adapting the \ac{LR} in this fashion is the ability to use the \ac{LR} as a regularization and overfitting prevention method while keeping the \ac{LR} high. This helps to avoid steep areas of loss and to reach a better local optimum.
+
+\subsubsection{\ac{MSE}}
+Instead of the standard error (RMSE) we use the \ac{MSE}. \ac{MSE} is a loss function, corresponding to the expected value of the squared error, $MSE = (RMSE)^2$. The advantage over the \ac{RMSE} is that the \ac{MSE} considers both the variance of the estimator and its bias. \cite{lehmann2006theory}
+
+\subsubsection{Activation function and range adjustments}
+The prediction should always be in the range of $[1.0, 5.0]$. Therefore not every rating has an equal error range. We apply an adjusted sigmoid function as an activation function at the end, so that the output always stays in the range of $[0.5, 5.5]$. So every rating can have an error up to $\pm0.5$. It is important to note, that the final prediction is again cropped to the range of $[1.0, 5.0]$.
+
+\subsubsection{Hyperparameter tuning}
+By varying the update interval of the embeddings between all $(user, item)$ samples (i.e., the batch size), we can control the stability of the learning process and counter overfitting. The same applies to the number of times the whole set of $(user, item)$ pairs is used for updating the embeddings (the epochs). The randomly initialized variables for each embedding vector contains latent information in the form of a floating point number. However, this does not automatically mean that more variables are desirable, as with too much information, single information points become less important, and with too few variables, information might be missing. Thus it is of importance to find a vector length with the right amount of information. 

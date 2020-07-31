@@ -1,0 +1,24 @@
+\section{Discussion}
+\label{sec:discussion}
+% \todo[inline]{Based on the results sections, discuss strengths and weaknesses. Point out the implications of your novel idea on the application concerned.}
+
+% - impact of batch size
+% - impact of epoch size
+% - adaptive learning is good
+% - bagging is good
+% - averaging is good (removes outliers bla bla)
+
+\subsection{Batch size}
+The \ac{EDP} with Adam model had two sweet spots on two noticeably different batch sizes, a low one of 80 and a high one of 50'000 samples. Deviating from those numbers lead to a decrease on the training loss but a stagnation of the validation loss, strongly indicating overfitting on the training set. The higher the batch size got, the wider the gap between the losses became, contradicting our intuition that a higher batch size leads to a higher generalization over the data set, as the adjustable parameters only adapt after "seeing" a bigger picture. The same holds for a very low batch size ($< 60$).
+
+It is important to note that after finding a good training-validation loss relationship, the model was trained again with those parameters on the whole set.
+
+\subsection{Adaptive \ac{LR} and Averaging Over k}
+
+A large \ac{LR} ensures that the algorithm does not end up in a local minimum, which might be a lot larger than the desired global minimum. A small \ac{LR} however, prevents a lack of accuracy in the calculation of the predictions. Decreasing the \ac{LR} with time results in a better prediction accuracy and a better local minimum.
+
+Choosing the number of factors for the matrix factorization is a trade-off between a good personalization and overfitting of the predictions. Considering the error of all asked entries, all values of $k$ in the interval [8,17] perform well, however our assumption is that for every $k$ there are some outliers, resulting in a bad prediction. Those outliers are not the same for all $k$, such that averaging reduces those deflections, moving them closer to the proper prediction value.
+
+\subsection{\ac{BACF}}
+
+Combining the two approaches has not only the effect of reducing overfitting, as presented by Breiman\cite{breiman}, but presumably also offers the same advantage as averaging over $k$, namely to reduce the effect of outliers on the overall score, combining their individual strengths. However, simply combining the best individual results does not end in the best overall score. The best score was found to be the combination of \ac{EDP} with \ac{SGD} using an adaptive \ac{LR} and averaging over $k$, and \ac{EDP} with Adam using a low batchsize. When considered individually, \ac{EDP} with Adam resulted in a better score when averaged over all batch sizes.

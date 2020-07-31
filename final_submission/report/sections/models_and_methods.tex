@@ -1,0 +1,23 @@
+\section{Models and Methods}
+\label{sec:models-methods}
+
+The collaborative filtering problem can also be interpreted as follows: Given an incomplete matrix $A \in \mathbb{R}^{m x n}$, where $m$ is the number of users and $n$ the number of items, predict values for all missing ratings, based on the given entries.
+
+\input{sections/evaluation_metric}
+\input{sections/evaluation_methods}
+
+\subsection{Baseline Algorithms}\label{sec:baseline}
+
+The following section presents three baseline algorithms for collaborative filtering. 
+
+\input{sections/similarities}
+\input{sections/svd}
+\input{sections/als}
+
+\input{sections/edp}
+
+\input{sections/edp_sgd}
+
+\input{sections/edp_adam}
+
+\input{sections/bagging}

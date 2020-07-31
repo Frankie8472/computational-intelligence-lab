@@ -1,0 +1,5 @@
+\section{Summary and Future Work}
+\label{sec:summary}
+%\todo[inline]{Summarize your contributions in light of the new results.}
+
+In this paper we presented a novel approach to the collaborative filtering problem, based on bootstrap aggregation of differently optimized \ac{EDP} algorithms, namely using \ac{SGD} and Adam. The \ac{SGD} optimized \ac{EDP} algorithm was further improved, using a decreasing \ac{LR} and averaging over a various number of factors in the matrix factorization. The Adam optimized \ac{EDP} algorithm was further improved by applying the one-cycle policy, extending the range through an activation function, hyperparamter tuning, and averaging over the results of different hyperparameters. Future possible improvements include different ways of decreasing the \ac{LR}s for the \ac{SGD} optimization\cite{lau_2020} and averaging not only over k, but also over other parameters, like the regularization factors and the various \ac{LR}s. When combining the two approaches into \ac{BACF}, the two optimizers may be weighted differently.

@@ -1,0 +1,52 @@
+\documentclass[10pt,conference,compsocconf]{IEEEtran}
+
+%\usepackage{times}
+%\usepackage{balance}
+\usepackage{url}
+\usepackage{graphicx}	% For figure environment
+\graphicspath{{figures/}}
+\usepackage{subcaption}
+\usepackage{todonotes}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{pdfpages}
+
+\usepackage[nolist,nohyperlinks]{acronym}
+
+\input{sections/acronym}
+
+\begin{document}
+\title{An Alternative Approach to Bootstrap Aggregation-Based Collaborative Filtering}
+
+\author{
+    Group: Backpropagaters\\
+    Josua Cantieni, Sarah Kamp, Franz Knobel, Silvia La\\
+    Department of Computer Science, ETH Zurich, Switzerland\\
+    \{josuac, skamp, knobelf, sla2\}@student.ethz.ch
+}
+
+\maketitle
+
+\input{sections/abstract}
+
+% reset acronyms
+\acresetall
+
+\input{sections/introduction}
+\input{sections/data}
+\input{sections/models_and_methods}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/summary}
+
+\bibliographystyle{IEEEtran}
+\bibliography{bibliography}
+
+\clearpage
+
+\begin{figure}[p]
+    \makebox[\textwidth]{
+        \includegraphics[width=2.1\linewidth]{Declaration-Originality_final.png}
+    }
+\end{figure}
+\end{document}

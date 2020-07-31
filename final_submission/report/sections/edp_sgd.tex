@@ -1,0 +1,43 @@
+\subsection{\ac{EDP} with \ac{SGD}}\label{sec:sgd}
+
+In the following subsection, we present various techniques to improve the accuracy of the \ac{EDP} and call the summary of those "EDP with SGD".
+
+\subsubsection{\ac{SGD}}
+
+The \ac{SGD} optimization technique minimizes a provided loss function. It does so by progressing in the opposite direction of the loss function gradient. \textit{Stochastic} gradient descent chooses a random sample and thereafter the weights are updated, as opposed to Gradient Descent which considers all samples before updating the weights. To prevent overfitting, regularization factors are added to the loss function. The quality and speed of convergence is controlled by the \ac{LR}.
+
+\subsubsection{Combining \ac{EDP} and \ac{SGD}}
+
+\ac{EDP} with \ac{SGD} works as follows: Two matrices U and V are randomly initialized. Thereafter, a given rating, $r_{i,j}$, is chosen u.a.r from the input matrix $A$ and the gradient is calculated:
+\begin{equation}
+    \nabla_{i,j} = r_{i,j} - \hat{r}_{i,j}
+\end{equation}
+Where $\hat{r}_{i,j}$ is the embedding dot product as explained in Section \ref{sec: edp}. Afterwards, the corresponding columns of $U$ and $V$ are updated, where $u_i$ is the $i^{th}$ column in $U$, $v_j$ is the $j^{th}$ column in $V$, $\mu$ is the \ac{LR} and $\lambda$ is the regularization parameter:
+\begin{equation}
+    u_i = u_i + \mu \cdot (\nabla_{i,j} \cdot v_j - \lambda \cdot u_i)
+\end{equation}
+\begin{equation}
+    v_j = v_j + \mu \cdot (\nabla_{i,j} \cdot u_i - \lambda \cdot v_j)
+\end{equation}
+Let $mean$ describe the global mean of all given ratings. The bias vectors are updated using a regularization factor $\lambda_2$:
+\begin{equation}
+    bu_u = bu_u + \mu \cdot (\nabla_{i,j} - \lambda_2 \cdot (bu_u + bv_i - mean))
+\end{equation}
+\begin{equation}
+    bv_i = bv_i + \mu \cdot (\nabla_{i,j} - \lambda_2 \cdot (bv_i + bu_u - mean))
+\end{equation}
+
+\subsubsection{SGD Adjustments}
+
+After observing that \ac{SGD} does not converge significantly after 100 million iterations, this value was set as the default number of iterations after which the algorithm terminates, where one iteration is defined in the subsection above. 
+
+The \ac{LR} was initially set to 0.1, a very popular choice for this purpose. By applying cross validation and grid search, the best values for $\lambda$ and $\lambda_2$ were found to be 0.08 and 0.04 respectively. 
+
+\subsubsection{Decreasing Learning Rate\cite{lau_2020}} \label{sec:sgd_lr}
+
+We have found that a good strategy is to have a rather large \ac{LR} in the beginning and to slowly decrease it every few iterations. By means of cross validation we have found that the best method is to divide the current \ac{LR} by two after a constant amount of iterations. Since the number of iterations was fixed to 100 millions, the \ac{LR} was halved every 10 million iterations, starting with a \ac{LR} of 0.1.
+
+\subsubsection{Averaging over k}\label{sec:sgd_k}
+
+Increasing the number of factors $k$ will result in a better personalization of the prediction, up until to the point where overfitting starts to happen and the quality of the recommendations starts to decrease. 
+Based on the results obtained in the \ac{SVD} approach described in Section \ref{sec:svd}, a good range for $k$ was found to be in the interval [8, 17]. The different values for $k$ were then combined, by performing the above procedure for each $k \in [8,17]$, and computing the average prediction over all resulting matrices. Averaging over $k$ is a form of bootstrap aggregation, however, we will refer to it as "averaging over k", in order to differentiate between this procedure and the bootstrap aggregation described in Section \ref{sec:bagging}.
