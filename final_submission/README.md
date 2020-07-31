@@ -39,7 +39,7 @@ The run BCAF the following need to be installed:
 - `./baselines`
     - `./als`
         - `./output`: ALS output folder
-	- `README.md`: how to run the ALS baseline
+	    - `README.md`: how to run the ALS baseline
         - `als.py`: computes the "Alternating Least Squares" algorithm on the training set
         - `als_data_util.py`: helper functions for als.py
     - `./svd`
