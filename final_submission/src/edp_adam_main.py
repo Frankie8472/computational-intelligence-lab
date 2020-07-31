@@ -65,8 +65,8 @@ class Parameters:
         self.SPLIT_VAL_RATE = 0.1  # Automatically set to zero if self.Predict set to True
         self.USE_DNN = False
         self.WORKING_PATH = "."
-        self.DATA_SET_PATH = "../../input/data_train.csv"
-        self.RES_SET_PATH = "../../output/sampleSubmission.csv"
+        self.DATA_SET_PATH = "../input/data_train.csv"
+        self.RES_SET_PATH = "../input/sampleSubmission.csv"
         self.MODEL_SAVE_PATH = "./models/"
         self.MODEL_SAVE_NAME = "trained_model.pkl"
         self.DTYPE = torch.double
