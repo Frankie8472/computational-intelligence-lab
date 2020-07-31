@@ -9,15 +9,19 @@ This repository cointains all relevant code for the project. It contains the
 implementation of the the baseline algorithms and BCAF. Further, it contains the source files of the report.
 
 ## How to Run BCAF
-1. Run EDP with SGD. The output is found in `./output/`
+1. Go into `src` folder.
+```bash
+cd src
+```
+2. Run EDP with SGD. The output is found in `./output/`
 ```bash
 python3 src/edp_sgd_main.py
 ```
-2. Run EDP with Adam. The output is found in `./output/`
+3. Run EDP with Adam. The output is found in `./output/`
 ```bash
 python3 src/edp_adam_main.py
 ```
-3. Do bootstrap aggregation. The output is found in `./output/bagging`
+4. Do bootstrap aggregation. The output is found in `./output/bagging`
 ```bash
 python3 src/bagging_main.py
 ```
