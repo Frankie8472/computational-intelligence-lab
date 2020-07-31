@@ -184,7 +184,8 @@ def main():
     print("Reading data...")
     df = import_data('../../input/data_train.csv')
     df_pred = import_data('../../input/sampleSubmission.csv')
-
+    df_pred["rating"] = df["rating"].mean()
+    print(df["rating"].mean())
     print("Running threads...")
     predictions = {}
     try:
