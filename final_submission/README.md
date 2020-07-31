@@ -2,7 +2,7 @@
 
 **[Computational Intelligence Lab 2020](http://da.inf.ethz.ch/teaching/2020/CIL/)**
 
-Authors: Josua Cantieni, Sarah Kamp, Franz Knobel, Silvia La
+Authors: Josua Cantieni, Sarah Kamp, Franz Knobel, Silvia La  
 Group: Backpropagaters
 
 This repository cointains all relevant code for the project. It contains the 
