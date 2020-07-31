@@ -2,8 +2,6 @@ import numpy as np
 import random
 from typing import *
 
-
-# return a list of entries that should be predicted
 def get_asked_entries() -> List[Tuple[int, int]]:
     """
     Return a list of entries that should be predicted.
