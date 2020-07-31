@@ -55,7 +55,7 @@ def parsef(line: str) -> Tuple[int, int, int]:
     return row, column, value
 
 
-def load_data_raw() -> Tuple[List[int], List[int], List[int], List[int],
+def load_data_separated() -> Tuple[List[int], List[int], List[int], List[int],
         List[int], List[int]]:
     '''
     Load data from csv.
