@@ -39,7 +39,7 @@ def store_data_float(result_matrix: 'numpy.ndarray', file_name: str) -> None:
                 str(result_matrix[i][j]) + '\n')  # store with the same ID as the sample
 
 
-def parsef(line: str) -> Tuple[int, int, int]:
+def parse_line(line: str) -> Tuple[int, int, int]:
     '''
     Parse a line in input data/submission format.
 
@@ -82,7 +82,7 @@ def load_data_separated() -> Tuple[List[int], List[int], List[int], List[int],
         content = content[1:]
         for line in content:
             if line:
-                row, column, value = parsef(line)
+                row, column, value = parse_line(line)
                 items.append(column)
                 users.append(row)
                 ratings.append(value)
