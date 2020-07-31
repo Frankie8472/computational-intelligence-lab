@@ -20,14 +20,14 @@ def run_SGD(k: int, reg: float,
             tuples (r, c, rating), s.t. A[r][c] = rating
     '''
     # number of iterations
-    it = 100000000
+    nr_of_iterations = 100000000
 
     # load data
-    data_all = util.load_data_raw()
+    data_all = util.load_data_separated()
     data = list(zip(data_all[0], data_all[1], data_all[2]))
     validation_set = list(zip(data_all[3], data_all[4], data_all[5]))
 
-    global_mean = np.mean(data_all[2])
+    data_mean = np.mean(data_all[2])
 
     U = np.random.uniform(0, 0.05, (nr_users, k))
     V = np.random.uniform(0, 0.05, (nr_movies, k))
@@ -37,37 +37,32 @@ def run_SGD(k: int, reg: float,
 
     lr = 0.1
 
-    for s in range(it):
-        if s % 10000000 == 0:
+    for iteration in range(nr_of_iterations):
+        if iteration % 10000000 == 0:
             # print('k='+str(k)+', learning rate: '+str(lr))
             lr /= 2
-        d, n, v = random.choice(data)
-        d, n = d-1, n-1
-        U_d = U[d, :]
-        V_n = V[n, :]
+        user, item, v = random.choice(data)
+        user, item = user-1, item-1
 
-        biasU_d = biasU[d]
-        biasV_n = biasV[n]
-
-        guess = U_d.dot(V_n) + biasU_d + biasV_n
+        prediction = U[user, :].dot(V[item, :]) + biasU[user] + biasV[item]
 
         # error
-        delta = v - guess
+        gradient = v - prediction
 
         # update U and V matrices
-        new_U_d = U_d + lr * (delta * V_n - reg * U_d)
-        new_V_n = V_n + lr * (delta * U_d - reg * V_n)
+        new_U_user = U[user, :] + lr * (gradient * V[item, :] - reg * U[user, :])
+        new_V_item = V_item + lr * (gradient * U[user, :] - reg * V[item, :])
         # update biases
-        new_biasU_d = biasU_d + lr * (delta - reg2 *
-                (biasU_d + biasV_n - global_mean))
-        new_biasV_n = biasV_n + lr * (delta - reg2 *
-                (biasV_n + biasU_d - global_mean))
+        new_biasU_user = biasU[user] + lr * (gradient - reg2 *
+                (biasU[user] + biasV[item] - data_mean))
+        new_biasV_item = biasV[item] + lr * (gradient - reg2 *
+                (biasV[item] + biasU[user] - data_mean))
 
-        U[d, :] = new_U_d
-        V[n, :] = new_V_n
+        U[user, :] = new_U_user
+        V[item, :] = new_V_item
 
-        biasU[d] = new_biasU_d
-        biasV[n] = new_biasV_n
+        biasU[user] = new_biasU_user
+        biasV[item] = new_biasV_item
  
     pred = U.dot(V.T) + biasU.reshape(-1, 1) + biasV
     pred[pred > 5.0] = 5.0
