@@ -1,7 +1,7 @@
 # Baseline SVD
 
 How to run:
-````bash
+```bash
 python3 run.py
 ```
 output file is saved to:
