@@ -15,15 +15,15 @@ cd src
 ```
 2. Run EDP with SGD. The output is found in `./output/`
 ```bash
-python3 src/edp_sgd_main.py
+python3 edp_sgd_main.py
 ```
 3. Run EDP with Adam. The output is found in `./output/`
 ```bash
-python3 src/edp_adam_main.py
+python3 edp_adam_main.py
 ```
 4. Do bootstrap aggregation. The output is found in `./output/bagging`
 ```bash
-python3 src/bagging_main.py
+python3 bagging_main.py
 ```
 
 ## Dependencies
