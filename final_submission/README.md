@@ -1,8 +1,34 @@
-# Project 1: Collaborative Filtering
+# Collaborative Filtering
 
 **[Computational Intelligence Lab 2020](http://da.inf.ethz.ch/teaching/2020/CIL/)**
 
 Authors: Josua Cantieni, Sarah Kamp, Franz Knobel, Silvia La
+Group: Backpropagaters
+
+This repository cointains all relevant code for the project. It contains the 
+implementation of the the baseline algorithms and BCAF. Further, it contains the source files of the report.
+
+## How to Run BCAF
+1. Run EDP with SGD. The output is found in `./output/`
+```bash
+python3 src/edp_sgd_main.py
+```
+2. Run EDP with Adam. The output is found in `./output/`
+```bash
+python3 src/edp_adam_main.py
+```
+3. Do bootstrap aggregation. The output is found in `./output/bagging`
+```bash
+python3 src/bagging_main.py
+```
+
+## Dependencies
+The run BCAF the following need to be installed:
+- Python 3
+- [Numpy](https://numpy.org/install/)
+- [Pandas](https://pandas.pydata.org/pandas-docs/stable/getting_started/install.html)
+- [PyTorch](https://pytorch.org/get-started/locally/)
+- [fastai](https://docs.fast.ai)
 
 ## Directory Structure
 
