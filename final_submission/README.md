@@ -2,7 +2,7 @@
 
 **[Computational Intelligence Lab 2020](http://da.inf.ethz.ch/teaching/2020/CIL/)**
 
-Authors: Josua Cantieni, Sarah Kamp, Franz Knobel, Silvia La
+Authors: Josua Cantieni, Sarah Kamp, Franz Knobel, Silvia La  
 Group: Backpropagaters
 
 This repository cointains all relevant code for the project. It contains the 
@@ -39,7 +39,7 @@ The run BCAF the following need to be installed:
 - `./baselines`
     - `./als`
         - `./output`: ALS output folder
-	- `README.md`: how to run the ALS baseline
+	    - `README.md`: how to run the ALS baseline
         - `als.py`: computes the "Alternating Least Squares" algorithm on the training set
         - `als_data_util.py`: helper functions for als.py
     - `./svd`
