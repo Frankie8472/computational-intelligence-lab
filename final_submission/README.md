@@ -36,10 +36,6 @@ The run BCAF the following need to be installed:
 
 ## Directory Structure
 
-- `data_interpretation.ipynb`: Plot and interpret the data
-- `./input`
-    - `data_train.csv`: [training set](https://www.kaggle.com/c/cil-collab-filtering-2020/data)
-    - `sampleSubmission.csv`: [sample submission file](https://www.kaggle.com/c/cil-collab-filtering-2020/data)
 - `./baselines`
     - `./als`
         - `./output`: ALS output folder
@@ -57,11 +53,16 @@ The run BCAF the following need to be installed:
         - `./output`: KNN output folder
         - `README.md`: how to run the KNN baseline
         - `similarity.py`: computes the "k-nearest neighbors" algorithm on the training set
+- `./input`
+    - `data_train.csv`: [training set](https://www.kaggle.com/c/cil-collab-filtering-2020/data)
+    - `sampleSubmission.csv`: [sample submission file](https://www.kaggle.com/c/cil-collab-filtering-2020/data)
+- `./output`: output directory for the EDP algorithms in `./src`
+    - `./bagging`: BACF output folder
+- `./report`: all relevant files of the report
 - `./src`
     - `bagging_main.py`: averages all csv submission files in `.output/bagging` and writes the result into a new csv file in `./output/bagging`
     - `edp_adam_main.py`: runs EDP with the Adam optimizer
     - `edp_sgd_data_util.py`: helper functions for edp_sgd_main.py
     - `edp_sgd_main.py`: runs EDP with the SGD optimizer in parallel for different values for 'k' and averages over all runs
-- `./output`: output directory for the EDP algorithms in `./src`
-    - `./bagging`: BACF output folder
-- `./report`: all relevant files of the report
+- `README.md`: this file
+- `data_interpretation.ipynb`: Plot and interpret the data
