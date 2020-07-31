@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import time
-import sgd_data_util as util
+import edp_sgd_data_util as util
 from multiprocessing import Pool
 from typing import *
 
