@@ -4,7 +4,7 @@
 A recommender system is concerned with presenting items (e.g. books on Amazon, movies at Movielens or music at lastFM) that are likely to interest the user. In collaborative filtering, we base our recommendations on the (known) preference of the user towards other items, and also take into account the preferences of other users.
 
 ### Competition
-https://www.kaggle.com/c/cil-collaborative-filtering-2021  
+https://www.kaggle.com/c/cil-collaborative-filtering-2020  
 To join the Kaggle competition, please use the private links shared on the CIL webpage -> Semester Project.  
 ### Resources
 All the necessary resources (including training data) are available through Kaggle.  
